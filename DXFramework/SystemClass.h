@@ -18,6 +18,7 @@
 /////////////////////////////////////////////
 #include "InputClass.h"
 #include "GraphicsClass.h"
+#include "SoundClass.h"
 
 /////////////////////////////////////////////
 //	Class Name: SystemClass
@@ -47,6 +48,7 @@ private:
 
 	InputClass* m_Input;
 	GraphicsClass* m_Graphics;
+	SoundClass* m_Sound;
 };
 
 /////////////////////////////////////////////
