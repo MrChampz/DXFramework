@@ -99,12 +99,19 @@ void GraphicsClass::Shutdown()
 	return;
 }
 
-bool GraphicsClass::Frame(int mouseX, int mouseY)
+bool GraphicsClass::Frame(int fps, int cpu, float frameTime)
 {
 	bool result;
 
-	// Set the location of the mouse
-	result = m_Text->SetMousePosition(mouseX, mouseY, m_Direct3D->GetDeviceContext());
+	// Set the frames per second
+	result = m_Text->SetFps(fps, m_Direct3D->GetDeviceContext());
+	if (!result)
+	{
+		return false;
+	}
+
+	// Set the cpu usage
+	result = m_Text->SetCpu(cpu, m_Direct3D->GetDeviceContext());
 	if (!result)
 	{
 		return false;
