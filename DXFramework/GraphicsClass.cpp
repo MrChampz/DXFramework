@@ -7,8 +7,7 @@ GraphicsClass::GraphicsClass()
 {
 	m_Direct3D = 0;
 	m_Camera = 0;
-	m_TextureShader = 0;
-	m_Bitmap = 0;
+	m_Text = 0;
 }
 
 GraphicsClass::GraphicsClass(const GraphicsClass& other)
@@ -22,6 +21,7 @@ GraphicsClass::~GraphicsClass()
 bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 {
 	bool result;
+	XMMATRIX baseViewMatrix;
 
 	// Create the Direct3D object
 	m_Direct3D = new D3DClass;
@@ -46,81 +46,39 @@ bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 	}
 
 	// Set the initial position of the camera
-	m_Camera->SetPosition(0.0f, 0.0f, -15.0f);
+	m_Camera->SetPosition(0.0f, 0.0f, -1.0f);
+	m_Camera->Render();
+	m_Camera->GetViewMatrix(baseViewMatrix);
 
-	// Create the TextureShader object.
-	m_TextureShader = new TextureShaderClass;
-	if (!m_TextureShader)
+	// Create the text object.
+	m_Text = new TextClass;
+	if (!m_Text)
 	{
 		return false;
 	}
 
-	// Initialize the TextureShader object
-	result = m_TextureShader->Initialize(m_Direct3D->GetDevice(), hwnd);
+	// Initialize the text object.
+	result = m_Text->Initialize(m_Direct3D->GetDevice(), m_Direct3D->GetDeviceContext(), hwnd,
+		screenWidth, screenHeight, baseViewMatrix);
 	if (!result)
 	{
-		MessageBox(hwnd, L"Could not initialize the TextureShader object", L"Error", MB_OK);
+		MessageBox(hwnd, L"Could not initialize the Text object.", L"Error", MB_OK);
 		return false;
 	}
 
-	// Create the Bitmap object.
-	m_Bitmap = new BitmapClass;
-	if (!m_Bitmap)
-	{
-		return false;
-	}
-
-	// Initialize the Bitmap object.
-	result = m_Bitmap->Initialize(m_Direct3D->GetDevice(), m_Direct3D->GetDeviceContext(), screenWidth, screenHeight,
-		"Data/Stone.tga", 48, 48);
-	if (!result)
-	{
-		MessageBox(hwnd, L"Could not initialize the Bitmap object.", L"Error", MB_OK);
-		return false;
-	}
-
-	////
-
-	m_Model = new ModelClass;
-	if (!m_Model)
-	{
-		return false;
-	}
-
-	result = m_Model->Initialize(m_Direct3D->GetDevice(), m_Direct3D->GetDeviceContext(), "Data/Statue.vin", "Data/Stone.tga");
-	if (!result)
-	{
-		MessageBox(hwnd, L"Could not initialize the Model object.", L"Error", MB_OK);
-		return false;
-	}
+	
 
 	return true;
 }
 
 void GraphicsClass::Shutdown()
 {
-	// 
-	if (m_Model)
+	// Release the Text object.
+	if (m_Text)
 	{
-		m_Model->Shutdown();
-		delete m_Model;
-		m_Model = 0;
-	}
-
-	// Release the Bitmap object.
-	if (m_Bitmap)
-	{
-		m_Bitmap->Shutdown();
-		delete m_Bitmap;
-		m_Bitmap = 0;
-	}
-
-	// Release the TextureShader object.
-	if (m_TextureShader)
-	{
-		m_TextureShader->Shutdown();
-		delete m_TextureShader;
-		m_TextureShader = 0;
+		m_Text->Shutdown();
+		delete m_Text;
+		m_Text = 0;
 	}
 
 	// Release the Camera object
@@ -141,29 +99,24 @@ void GraphicsClass::Shutdown()
 	return;
 }
 
-bool GraphicsClass::Frame()
+bool GraphicsClass::Frame(int mouseX, int mouseY)
 {
 	bool result;
-	static float rotation = 0.0f;
 
-	// Update the rotation variable each frame
-	rotation += (float)XM_PI * 0.005f;
-	if (rotation > 360.0f)
-	{
-		rotation -= 360.0f;
-	}
-
-	// Render the graphics scene
-	result = Render(rotation);
+	// Set the location of the mouse
+	result = m_Text->SetMousePosition(mouseX, mouseY, m_Direct3D->GetDeviceContext());
 	if (!result)
 	{
 		return false;
 	}
 
+	// Set the position of the camera
+	m_Camera->SetPosition(0.0f, 0.0f, -10.0f);
+
 	return true;
 }
 
-bool GraphicsClass::Render(float rotation)
+bool GraphicsClass::Render()
 {
 	XMMATRIX worldMatrix, viewMatrix, projectionMatrix, orthoMatrix;
 	bool result;
@@ -180,41 +133,21 @@ bool GraphicsClass::Render(float rotation)
 	m_Direct3D->GetProjectionMatrix(projectionMatrix);
 	m_Direct3D->GetOrthoMatrix(orthoMatrix);
 
-	///
-
-	// Rotate the world matrix by the rotation value so that the triangle will spin.
-	//worldMatrix = XMMatrixRotationY(rotation);
-
-	// Put the model vertex and index buffers on the graphics pipeline to prepare them for drawing.
-	m_Model->Render(m_Direct3D->GetDeviceContext());
-
-	// Render the model with the TextureShader
-	result = m_TextureShader->Render(m_Direct3D->GetDeviceContext(), m_Model->GetIndexCount(),
-		worldMatrix, viewMatrix, projectionMatrix, m_Model->GetTexture());
-	if (!result)
-	{
-		return false;
-	}
-
-	///
-
 	// Turn off the Z buffer to begin all 2D rendering
 	m_Direct3D->TurnZBufferOff();
 
-	// Put the bitmap vertex and index buffers on the graphics pipeline to prepare them for drawing.
-	result = m_Bitmap->Render(m_Direct3D->GetDeviceContext(), x, y);
+	// Turn on the alpha blending before rendering the text.
+	m_Direct3D->TurnOnAlphaBlending();
+
+	// Render the text strings.
+	result = m_Text->Render(m_Direct3D->GetDeviceContext(), worldMatrix, orthoMatrix);
 	if (!result)
 	{
 		return false;
 	}
 
-	// Render the bitmap with the texture shader.
-	result = m_TextureShader->Render(m_Direct3D->GetDeviceContext(), m_Bitmap->GetIndexCount(),
-		worldMatrix, viewMatrix, orthoMatrix, m_Bitmap->GetTexture());
-	if (!result)
-	{
-		return false;
-	}
+	// Turn off alpha blending after rendering the text.
+	m_Direct3D->TurnOffAlphaBlending();
 
 	// Turn the Z buffer back on now that all 2D rendering has completed
 	m_Direct3D->TurnZBufferOn();
