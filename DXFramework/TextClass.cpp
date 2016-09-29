@@ -68,22 +68,8 @@ bool TextClass::Initialize(ID3D11Device* device, ID3D11DeviceContext* deviceCont
 		return false;
 	}
 
-	// Now update the sentence vertex buffer with the new string information
-	result = UpdateSentence(m_sentence1, "Ola", 100, 100, 1.0f, 0.0f, 0.0f, deviceContext);
-	if (!result)
-	{
-		return false;
-	}
-
 	// Initialize the second sentence
 	result = InitializeSentence(&m_sentence2, 16, device);
-	if (!result)
-	{
-		return false;
-	}
-
-	// Now update the sentence vertex buffer with the new string information
-	result = UpdateSentence(m_sentence2, "DXFramework", 100, 120, 1.0f, 0.0f, 0.0f, deviceContext);
 	if (!result)
 	{
 		return false;
@@ -212,6 +198,30 @@ bool TextClass::SetCpu(int cpu, ID3D11DeviceContext* deviceContext)
 
 	// Update the sentence vertex buffer with the new string information.
 	result = UpdateSentence(m_sentence2, cpuString, 20, 40, 0.0f, 1.0f, 0.0f, deviceContext);
+	if (!result)
+	{
+		return false;
+	}
+
+	return true;
+}
+
+bool TextClass::SetRenderCount(int renderCount, ID3D11DeviceContext* deviceContext)
+{
+	char tempString[17];
+	char renderCountString[17];
+	bool result;
+
+
+	// Convert the cpu integer to string format.
+	_itoa_s(renderCount, tempString, 10);
+
+	// Setup the cpu string.
+	strcpy_s(renderCountString, "Render Count: ");
+	strcat_s(renderCountString, tempString);
+
+	// Update the sentence vertex buffer with the new string information.
+	result = UpdateSentence(m_sentence2, renderCountString, 20, 40, 1.0f, 1.0f, 1.0f, deviceContext);
 	if (!result)
 	{
 		return false;

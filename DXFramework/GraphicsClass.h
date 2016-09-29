@@ -14,6 +14,10 @@
 #include "D3DClass.h"
 #include "CameraClass.h"
 #include "TextClass.h"
+#include "ModelClass.h"
+#include "ModelListClass.h"
+#include "FrustumClass.h"
+#include "MultiTextureShaderClass.h"
 
 /////////////////////////////////////////////
 //	GLOBALS
@@ -35,11 +39,15 @@ public:
 
 	bool Initialize(int, int, HWND);
 	void Shutdown();
-	bool Frame(int, int, float);
+	bool Frame(int, float);
 	bool Render();
 
 private:
 	D3DClass* m_Direct3D;
 	CameraClass* m_Camera;
 	TextClass* m_Text;
+	ModelClass* m_Model;
+	ModelListClass* m_ModelList;
+	FrustumClass* m_Frustum;
+	MultiTextureShaderClass* m_MultiTextureShader;
 };
