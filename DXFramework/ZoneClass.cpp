@@ -81,7 +81,7 @@ bool ZoneClass::Initialize(D3DClass* Direct3D, HWND hwnd, int screenWidth, int s
 	}
 
 	// Initialize the Terrain object
-	result = m_Terrain->Initialize(Direct3D->GetDevice(), "Data/Maps/Map01.map");
+	result = m_Terrain->Initialize(Direct3D->GetDevice(), "Data/Maps/Map01/Map01.map");
 	if (!result)
 	{
 		MessageBox(hwnd, L"Could not initialize the Terrain object", L"Error", MB_OK);
@@ -252,8 +252,8 @@ bool ZoneClass::Render(D3DClass* Direct3D, ShaderManagerClass* ShaderManager, Te
 
 	// Render the terrain grid using the color shader.
 	m_Terrain->Render(Direct3D->GetDeviceContext());
-	result = ShaderManager->RenderLightShader(Direct3D->GetDeviceContext(), m_Terrain->GetIndexCount(), worldMatrix, viewMatrix,
-		projectionMatrix, TextureManager->GetTexture(1), m_Camera->GetPosition(), m_Light->GetDirection(),
+	result = ShaderManager->RenderTerrainShader(Direct3D->GetDeviceContext(), m_Terrain->GetIndexCount(), worldMatrix,
+		viewMatrix, projectionMatrix, TextureManager->GetTexture(0), TextureManager->GetTexture(1), m_Light->GetDirection(),
 		m_Light->GetDiffuseColor());
 	if (!result)
 	{

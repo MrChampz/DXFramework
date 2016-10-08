@@ -134,6 +134,7 @@
     <ClCompile Include="SoundClass.cpp" />
     <ClCompile Include="SystemClass.cpp" />
     <ClCompile Include="TerrainClass.cpp" />
+    <ClCompile Include="TerrainShaderClass.cpp" />
     <ClCompile Include="TextClass.cpp" />
     <ClCompile Include="TextureArrayClass.cpp" />
     <ClCompile Include="TextureClass.cpp" />
@@ -168,6 +169,7 @@
     <ClInclude Include="SoundClass.h" />
     <ClInclude Include="SystemClass.h" />
     <ClInclude Include="TerrainClass.h" />
+    <ClInclude Include="TerrainShaderClass.h" />
     <ClInclude Include="TextClass.h" />
     <ClInclude Include="TextureArrayClass.h" />
     <ClInclude Include="TextureClass.h" />
@@ -190,6 +192,8 @@
     <None Include="Shaders\LightMap.vs" />
     <None Include="Shaders\MultiTexture.ps" />
     <None Include="Shaders\MultiTexture.vs" />
+    <None Include="Shaders\Terrain.ps" />
+    <None Include="Shaders\Terrain.vs" />
     <None Include="Shaders\Texture.ps" />
     <None Include="Shaders\Texture.vs" />
   </ItemGroup>

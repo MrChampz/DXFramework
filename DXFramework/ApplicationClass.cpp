@@ -87,13 +87,15 @@ bool ApplicationClass::Initialize(HINSTANCE hInstance, HWND hwnd, int screenWidt
 	}
 
 	// Load textures into TextureManager
-	result = m_TextureManager->LoadTexture(m_Direct3D->GetDevice(), m_Direct3D->GetDeviceContext(), "Data/Maps/Test.tga", 0);
+	result = m_TextureManager->LoadTexture(m_Direct3D->GetDevice(), m_Direct3D->GetDeviceContext(),
+		"Data/Maps/Dirt_diff.tga", 0);
 	if (!result)
 	{
 		return false;
 	}
 
-	result = m_TextureManager->LoadTexture(m_Direct3D->GetDevice(), m_Direct3D->GetDeviceContext(), "Data/Maps/Dirt.tga", 1);
+	result = m_TextureManager->LoadTexture(m_Direct3D->GetDevice(), m_Direct3D->GetDeviceContext(),
+		"Data/Maps/Dirt_normal.tga", 1);
 	if (!result)
 	{
 		return false;
