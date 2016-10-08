@@ -16,13 +16,7 @@
 /////////////////////////////////////////////
 //	MY INCLUDES
 /////////////////////////////////////////////
-#include "InputClass.h"
-#include "GraphicsClass.h"
-#include "SoundClass.h"
-#include "FpsClass.h"
-#include "CpuClass.h"
-#include "TimerClass.h"
-#include "PositionClass.h"
+#include "ApplicationClass.h"
 
 /////////////////////////////////////////////
 //	Class Name: SystemClass
@@ -49,14 +43,7 @@ private:
 	LPCWSTR m_applicationName;
 	HINSTANCE m_hInstance;
 	HWND m_hwnd;
-
-	InputClass* m_Input;
-	GraphicsClass* m_Graphics;
-	SoundClass* m_Sound;
-	FpsClass* m_Fps;
-	CpuClass* m_Cpu;
-	TimerClass* m_Timer;
-	PositionClass* m_Position;
+	ApplicationClass* m_Application;
 };
 
 /////////////////////////////////////////////

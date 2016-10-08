@@ -34,9 +34,19 @@ public:
 	bool Frame();
 
 	bool IsEscapePressed();
-	bool IsLeftArrowPressed();
-	bool IsRightArrowPressed();
 	void GetMouseLocation(int&, int&);
+
+	bool IsLeftPressed();
+	bool IsRightPressed();
+	bool IsUpPressed();
+	bool IsDownPressed();
+	bool IsAPressed();
+	bool IsZPressed();
+	bool IsPgUpPressed();
+	bool IsPgDownPressed();
+
+	bool IsF1Toggled();
+	bool IsF2Toggled();
 
 private:
 	bool ReadKeyboard();
@@ -52,4 +62,7 @@ private:
 
 	int m_screenWidth, m_screenHeight;
 	int m_mouseX, m_mouseY;
+
+	bool m_F1_released;
+	bool m_F2_released;
 };

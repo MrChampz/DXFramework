@@ -9,6 +9,7 @@ TextureArrayClass::TextureArrayClass()
 	m_texture = 0;
 	m_textureView[0] = 0;
 	m_textureView[1] = 0;
+	m_textureView[2] = 0;
 }
 
 TextureArrayClass::TextureArrayClass(const TextureArrayClass& other)
@@ -19,7 +20,8 @@ TextureArrayClass::~TextureArrayClass()
 {
 }
 
-bool TextureArrayClass::Initialize(ID3D11Device* device, ID3D11DeviceContext* deviceContext, char* filename1, char* filename2)
+bool TextureArrayClass::Initialize(ID3D11Device* device, ID3D11DeviceContext* deviceContext,
+	char* filename1, char* filename2, char* filename3)
 {
 	bool result;
 	int height, width;
@@ -136,11 +138,72 @@ bool TextureArrayClass::Initialize(ID3D11Device* device, ID3D11DeviceContext* de
 	delete[] m_targaData;
 	m_targaData = 0;
 
+	// Load the third texture
+	// Load the targa image data into memory
+	result = LoadTarga(filename3, height, width);
+	if (!result)
+	{
+		return false;
+	}
+
+	// Setup the description of the texture
+	textureDesc.Height = height;
+	textureDesc.Width = width;
+	textureDesc.MipLevels = 0;
+	textureDesc.ArraySize = 1;
+	textureDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+	textureDesc.SampleDesc.Count = 1;
+	textureDesc.SampleDesc.Quality = 0;
+	textureDesc.Usage = D3D11_USAGE_DEFAULT;
+	textureDesc.BindFlags = D3D11_BIND_SHADER_RESOURCE | D3D11_BIND_RENDER_TARGET;
+	textureDesc.CPUAccessFlags = 0;
+	textureDesc.MiscFlags = D3D11_RESOURCE_MISC_GENERATE_MIPS;
+
+	// Create the empty texture
+	hResult = device->CreateTexture2D(&textureDesc, NULL, &m_texture);
+	if (FAILED(hResult))
+	{
+		return false;
+	}
+
+	// Set the row pitch of the targa image data
+	rowPitch = (width * 4) * sizeof(unsigned char);
+
+	// Copy the targa image data into the texture
+	deviceContext->UpdateSubresource(m_texture, 0, NULL, m_targaData, rowPitch, 0);
+
+	// Setup the shader resource view description
+	srvDesc.Format = textureDesc.Format;
+	srvDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
+	srvDesc.Texture2D.MostDetailedMip = 0;
+	srvDesc.Texture2D.MipLevels = -1;
+
+	// Create the shader resource view for the texture
+	hResult = device->CreateShaderResourceView(m_texture, &srvDesc, &m_textureView[2]);
+	if (FAILED(hResult))
+	{
+		return false;
+	}
+
+	// Generate mipmaps for this texture
+	deviceContext->GenerateMips(m_textureView[2]);
+
+	// Release the targa image data now that the image data has been loaded into the texture
+	delete[] m_targaData;
+	m_targaData = 0;
+
 	return true;
 }
 
 void TextureArrayClass::Shutdown()
 {
+	// Release the third texture view resource
+	if (m_textureView[2])
+	{
+		m_textureView[2]->Release();
+		m_textureView[2] = 0;
+	}
+
 	// Release the second texture view resource
 	if (m_textureView[1])
 	{

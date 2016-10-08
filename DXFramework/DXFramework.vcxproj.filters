@@ -27,9 +27,6 @@
     <ClCompile Include="InputClass.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="GraphicsClass.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="D3DClass.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -93,15 +90,36 @@
     <ClCompile Include="TextureArrayClass.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="LightMapShaderClass.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="AlphaMapShaderClass.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ApplicationClass.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ZoneClass.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="TerrainClass.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ShaderManagerClass.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="UserInterfaceClass.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="TextureManagerClass.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="SystemClass.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="InputClass.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="GraphicsClass.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="D3DClass.h">
@@ -170,6 +188,30 @@
     <ClInclude Include="TextureArrayClass.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="LightMapShaderClass.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="AlphaMapShaderClass.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ApplicationClass.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ZoneClass.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="TerrainClass.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ShaderManagerClass.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="UserInterfaceClass.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="TextureManagerClass.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Shaders\Color.ps">
@@ -200,6 +242,18 @@
       <Filter>Shaders</Filter>
     </None>
     <None Include="Shaders\MultiTexture.vs">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="Shaders\LightMap.ps">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="Shaders\LightMap.vs">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="Shaders\AlphaMap.ps">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="Shaders\AlphaMap.vs">
       <Filter>Shaders</Filter>
     </None>
   </ItemGroup>

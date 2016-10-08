@@ -5,13 +5,7 @@
 
 SystemClass::SystemClass()
 {
-	m_Input = 0;
-	m_Graphics = 0;
-	m_Sound = 0;
-	m_Fps = 0;
-	m_Cpu = 0;
-	m_Timer = 0;
-	m_Position = 0;
+	m_Application = 0;
 }
 
 SystemClass::SystemClass(const SystemClass& other)
@@ -34,89 +28,16 @@ bool SystemClass::Initialize()
 	// Initialize the Windows API
 	InitializeWindows(screenWidth, screenHeight);
 
-	// Create the input object. This object will be used to handle reading the keyboard input from the user
-	m_Input = new InputClass;
-	if (!m_Input)
+	// Create the Application Wrapper object.
+	m_Application = new ApplicationClass;
+	if (!m_Application)
 	{
 		return false;
 	}
 
-	// Initialize the input object
-	result = m_Input->Initialize(m_hInstance, m_hwnd, screenWidth, screenHeight);
+	// Initialize the Application Wrapper object.
+	result = m_Application->Initialize(m_hInstance, m_hwnd, screenWidth, screenHeight);
 	if (!result)
-	{
-		MessageBox(m_hwnd, L"Could not initialize the Input object.", L"Error", MB_OK);
-		return false;
-	}
-
-	// Create the graphics object. This object will handle rendering all the graphics for this application
-	m_Graphics = new GraphicsClass;
-	if (!m_Graphics)
-	{
-		return false;
-	}
-
-	// Initialize the graphics object
-	result = m_Graphics->Initialize(screenWidth, screenHeight, m_hwnd);
-	if (!result)
-	{
-		MessageBox(m_hwnd, L"Could not initialize the Graphics object.", L"Error", MB_OK);
-		return false;
-	}
-
-	// Create the Sound object
-	m_Sound = new SoundClass;
-	if (!m_Sound)
-	{
-		return false;
-	}
-
-	// Initialize the Sound object
-	result = m_Sound->Initialize(m_hwnd);
-	if (!result)
-	{
-		MessageBox(m_hwnd, L"Could not initialize the DirectSound.", L"Error", MB_OK);
-		return false;
-	}
-
-	// Create the Fps object
-	m_Fps = new FpsClass;
-	if (!m_Fps)
-	{
-		return false;
-	}
-
-	// Initialize the Fps object
-	m_Fps->Initialize();
-
-	// Create the Cpu object
-	m_Cpu = new CpuClass;
-	if (!m_Cpu)
-	{
-		return false;
-	}
-
-	// Initialize the Cpu object
-	m_Cpu->Initialize();
-
-	// Create the Timer object
-	m_Timer = new TimerClass;
-	if (!m_Timer)
-	{
-		return false;
-	}
-
-	// Initialize the Timer object
-	result = m_Timer->Initialize();
-	if (!result)
-	{
-		MessageBox(m_hwnd, L"Could not initialize the Timer object.", L"Error", MB_OK);
-		return false;
-	}
-
-	// Create the Position object
-	m_Position = new PositionClass;
-	if (!m_Position)
 	{
 		return false;
 	}
@@ -126,57 +47,12 @@ bool SystemClass::Initialize()
 
 void SystemClass::Shutdown()
 {
-	// Release the Position object
-	if (m_Position)
+	// Release the Application Wrapper object.
+	if (m_Application)
 	{
-		delete m_Position;
-		m_Position = 0;
-	}
-
-	// Release the Timer object
-	if (m_Timer)
-	{
-		delete m_Timer;
-		m_Timer = 0;
-	}
-
-	// Release the Cpu object
-	if (m_Cpu)
-	{
-		m_Cpu->Shutdown();
-		delete m_Cpu;
-		m_Cpu = 0;
-	}
-
-	// Release the Fps object
-	if (m_Fps)
-	{
-		delete m_Fps;
-		m_Fps = 0;
-	}
-
-	// Release the Sound object
-	if (m_Sound)
-	{
-		m_Sound->Shutdown();
-		delete m_Sound;
-		m_Sound = 0;
-	}
-
-	// Release the Graphics object
-	if (m_Graphics)
-	{
-		m_Graphics->Shutdown();
-		delete m_Graphics;
-		m_Graphics = 0;
-	}
-
-	// Release the Input object
-	if (m_Input)
-	{
-		m_Input->Shutdown();
-		delete m_Input;
-		m_Input = 0;
+		m_Application->Shutdown();
+		delete m_Application;
+		m_Application = 0;
 	}
 
 	// Shutdown the window
@@ -215,15 +91,8 @@ void SystemClass::Run()
 			result = Frame();
 			if (!result)
 			{
-				MessageBox(m_hwnd, L"Frame Processing Failed", L"Error", MB_OK);
 				done = true;
 			}
-		}
-
-		// Check if the user pressed escape and wants to quit
-		if (m_Input->IsEscapePressed() == true)
-		{
-			done = true;
 		}
 	}
 
@@ -232,48 +101,14 @@ void SystemClass::Run()
 
 bool SystemClass::Frame()
 {
-	bool keyDown, result;
-	float rotationY;
+	bool result;
 
-	// Update the system stats
-	m_Timer->Frame();
-	m_Fps->Frame();
-	m_Cpu->Frame();
-
-	// Do the input frame processing.
-	result = m_Input->Frame();
-	if(!result)
-	{
-		return false;
-	}
-
-	// Set the frame time for calculating the updated position
-	m_Position->SetFrameTime(m_Timer->GetTime());
-
-	// Check if the left or right arrow key has been pressed, if so rotate the camera accordingly.
-	keyDown = m_Input->IsLeftArrowPressed();
-	m_Position->TurnLeft(keyDown);
-
-	keyDown = m_Input->IsRightArrowPressed();
-	m_Position->TurnRight(keyDown);
-
-	// Get the current view point location
-	m_Position->GetRotation(rotationY);
-
-	// Do the frame preocessing for the graphics object
-	result = m_Graphics->Frame(m_Fps->GetFps(), rotationY);
+	// Do the frame processing for the application object.
+	result = m_Application->Frame();
 	if (!result)
 	{
 		return false;
 	}
-
-	// Finally render the graphics to the screen.
-	result = m_Graphics->Render();
-	if (!result)
-	{
-		return false;
-	}
-
 
 	return true;
 }

@@ -23,10 +23,14 @@ public:
 
 	float GetTime();
 
+	void StartTimer();
+	void StopTimer();
+	int GetTiming();
+
 private:
-	INT64 m_frequency;
-	float m_ticksPerMs;
+	float m_frequency;
 	INT64 m_startTime;
 	float m_frameTime;
+	INT64 m_beginTime, m_endTime;
 };
 

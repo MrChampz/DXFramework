@@ -1,5 +1,5 @@
 /////////////////////////////////////////////
-//	Filename: ModelClass.h
+//	Filename: TerrainClass.h
 /////////////////////////////////////////////
 #pragma once
 
@@ -9,18 +9,14 @@
 #include <d3d11.h>
 #include <DirectXMath.h>
 #include <fstream>
+#include <stdio.h>
 using namespace DirectX;
 using namespace std;
 
 /////////////////////////////////////////////
-//	MY INCLUDES
+//	Class name: TerrainClass
 /////////////////////////////////////////////
-#include "TextureArrayClass.h"
-
-/////////////////////////////////////////////
-//	Class name: ModelClass
-/////////////////////////////////////////////
-class ModelClass
+class TerrainClass
 {
 private:
 	struct VertexType
@@ -30,6 +26,12 @@ private:
 		XMFLOAT3 normal;
 	};
 
+	struct HeightMapType
+	{
+		float x, y, z;
+		float nx, ny, nz;
+	};
+
 	struct ModelType
 	{
 		float x, y, z;
@@ -37,34 +39,43 @@ private:
 		float nx, ny, nz;
 	};
 
-public:
-	ModelClass();
-	ModelClass(const ModelClass&);
-	~ModelClass();
+	struct VectorType
+	{
+		float x, y, z;
+	};
 
-	bool Initialize(ID3D11Device*, ID3D11DeviceContext*, char*, char*, char*, char*);
+public:
+	TerrainClass();
+	TerrainClass(const TerrainClass&);
+	~TerrainClass();
+
+	bool Initialize(ID3D11Device*, char*);
 	void Shutdown();
-	void Render(ID3D11DeviceContext*);
+	bool Render(ID3D11DeviceContext*);
 
 	int GetIndexCount();
-	ID3D11ShaderResourceView** GetTextureArray();
 
 private:
+	bool LoadSetupFile(char*);
+	bool LoadBitmapHeightMap();
+	void ShutdownHeightMap();
+	void SetTerrainCoordinates();
+	bool CalculateNormals();
+	bool BuildTerrainModel();
+	void ShutdownTerrainModel();
+
 	bool InitializeBuffers(ID3D11Device*);
 	void ShutdownBuffers();
 	void RenderBuffers(ID3D11DeviceContext*);
 
-	bool LoadTextures(ID3D11Device*, ID3D11DeviceContext*, char*, char*, char*);
-	void ReleaseTextures();
-
-	bool LoadModel(char*);
-	void ReleaseModel();
-
 private:
-	ID3D11Buffer* m_vertexBuffer;
-	ID3D11Buffer* m_indexBuffer;
+	ID3D11Buffer *m_vertexBuffer, *m_indexBuffer;
 	int m_vertexCount, m_indexCount;
-	TextureArrayClass* m_TextureArray;
-	ModelType* m_model;
+
+	int m_terrainHeight, m_terrainWidth;
+	float m_heightScale;
+	char* m_terrainFilename;
+	HeightMapType* m_heightMap;
+	ModelType* m_terrainModel;
 };
 

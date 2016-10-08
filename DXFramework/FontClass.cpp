@@ -17,9 +17,16 @@ FontClass::~FontClass()
 {
 }
 
-bool FontClass::Initialize(ID3D11Device* device, ID3D11DeviceContext* deviceContext, char* fontFilename, char* textureFilename)
+bool FontClass::Initialize(ID3D11Device* device, ID3D11DeviceContext* deviceContext,
+	char* fontFilename, char* textureFilename, float fontHeight, int spaceSize)
 {
 	bool result;
+
+	// Store the height of the font.
+	m_fontHeight = fontHeight;
+
+	// Store the size of spaces in pixel size.
+	m_spaceSize = spaceSize;
 
 	// Load in the text file containing the font data
 	result = LoadFontData(fontFilename);
@@ -150,58 +157,91 @@ void FontClass::BuildVertexArray(void* vertices, char* sentence, float drawX, fl
 	VertexType* vertexPtr;
 	int numLetters, index, i, letter;
 
-	// Coerce the input vertices into a VertexType structure
+
+	// Coerce the input vertices into a VertexType structure.
 	vertexPtr = (VertexType*)vertices;
 
-	// Get the number of letters in the sentence
+	// Get the number of letters in the sentence.
 	numLetters = (int)strlen(sentence);
 
-	// Initialize the index to the vertex array
+	// Initialize the index to the vertex array.
 	index = 0;
 
-	// Draw each letter onto a quad
-	for (i = 0; i < numLetters; i++)
+	// Draw each letter onto a quad.
+	for (i = 0; i<numLetters; i++)
 	{
 		letter = ((int)sentence[i]) - 32;
 
-		// If the letter is a space then just move over three pixels
+		// If the letter is a space then just move over three pixels.
 		if (letter == 0)
 		{
-			drawX = drawX + 3.0f;
+			drawX = drawX + (float)m_spaceSize;
 		}
 		else
 		{
-			// First triangle in quad
-			vertexPtr[index].position = XMFLOAT3(drawX, drawY, 0.0f);									// Top Left
+			// First triangle in quad.
+			vertexPtr[index].position = XMFLOAT3(drawX, drawY, 0.0f);  // Top left.
 			vertexPtr[index].texture = XMFLOAT2(m_Font[letter].left, 0.0f);
 			index++;
 
-			vertexPtr[index].position = XMFLOAT3((drawX + m_Font[letter].size), (drawY - 16), 0.0f);	// Bottom Right
+			vertexPtr[index].position = XMFLOAT3((drawX + m_Font[letter].size), (drawY - m_fontHeight), 0.0f);  // Bottom right.
 			vertexPtr[index].texture = XMFLOAT2(m_Font[letter].right, 1.0f);
 			index++;
 
-			vertexPtr[index].position = XMFLOAT3(drawX, (drawY - 16), 0.0f);							// Bottom Left
+			vertexPtr[index].position = XMFLOAT3(drawX, (drawY - m_fontHeight), 0.0f);  // Bottom left.
 			vertexPtr[index].texture = XMFLOAT2(m_Font[letter].left, 1.0f);
 			index++;
 
-			// Second triangle in quad
-			vertexPtr[index].position = XMFLOAT3(drawX, drawY, 0.0f);									// Top Left
+			// Second triangle in quad.
+			vertexPtr[index].position = XMFLOAT3(drawX, drawY, 0.0f);  // Top left.
 			vertexPtr[index].texture = XMFLOAT2(m_Font[letter].left, 0.0f);
 			index++;
 
-			vertexPtr[index].position = XMFLOAT3((drawX + m_Font[letter].size), drawY, 0.0f);			// Top Right
+			vertexPtr[index].position = XMFLOAT3(drawX + m_Font[letter].size, drawY, 0.0f);  // Top right.
 			vertexPtr[index].texture = XMFLOAT2(m_Font[letter].right, 0.0f);
 			index++;
 
-			vertexPtr[index].position = XMFLOAT3((drawX + m_Font[letter].size), (drawY - 16), 0.0f);	// Bottom Right
+			vertexPtr[index].position = XMFLOAT3((drawX + m_Font[letter].size), (drawY - m_fontHeight), 0.0f);  // Bottom right.
 			vertexPtr[index].texture = XMFLOAT2(m_Font[letter].right, 1.0f);
 			index++;
 
-			// Update the x location for drawing by the size of the letter and one pixel
+			// Update the x location for drawing by the size of the letter and one pixel.
 			drawX = drawX + m_Font[letter].size + 1.0f;
-
 		}
 	}
 
 	return;
+}
+
+
+int FontClass::GetSentencePixelLength(char* sentence)
+{
+	int pixelLength, numLetters, i, letter;
+
+
+	pixelLength = 0;
+	numLetters = (int)strlen(sentence);
+
+	for (i = 0; i<numLetters; i++)
+	{
+		letter = ((int)sentence[i]) - 32;
+
+		// If the letter is a space then count it as three pixels.
+		if (letter == 0)
+		{
+			pixelLength += m_spaceSize;
+		}
+		else
+		{
+			pixelLength += (m_Font[letter].size + 1);
+		}
+	}
+
+	return pixelLength;
+}
+
+
+int FontClass::GetFontHeight()
+{
+	return (int)m_fontHeight;
 }

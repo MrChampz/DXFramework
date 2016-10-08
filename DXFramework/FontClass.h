@@ -40,12 +40,13 @@ public:
 	FontClass(const FontClass&);
 	~FontClass();
 
-	bool Initialize(ID3D11Device*, ID3D11DeviceContext*, char*, char*);
+	bool Initialize(ID3D11Device*, ID3D11DeviceContext*, char*, char*, float, int);
 	void Shutdown();
 
 	ID3D11ShaderResourceView* GetTexture();
-
 	void BuildVertexArray(void*, char*, float, float);
+	int GetSentencePixelLength(char*);
+	int GetFontHeight();
 
 private:
 	bool LoadFontData(char*);
@@ -56,5 +57,7 @@ private:
 private:
 	FontType* m_Font;
 	TextureClass* m_Texture;
+	float m_fontHeight;
+	int m_spaceSize;
 };
 

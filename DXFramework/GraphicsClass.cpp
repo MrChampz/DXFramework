@@ -11,7 +11,7 @@ GraphicsClass::GraphicsClass()
 	m_Model = 0;
 	m_ModelList = 0;
 	m_Frustum = 0;
-	m_MultiTextureShader = 0;
+	m_AlphaMapShader = 0;
 }
 
 GraphicsClass::GraphicsClass(const GraphicsClass& other)
@@ -78,7 +78,8 @@ bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 	}
 
 	// Initialize the model object
-	result = m_Model->Initialize(m_Direct3D->GetDevice(), m_Direct3D->GetDeviceContext(), "Data/Cube.vin", "Data/Stone.tga", "Data/Dirt.tga");
+	result = m_Model->Initialize(m_Direct3D->GetDevice(), m_Direct3D->GetDeviceContext(),
+		"Data/Cube.vin", "Data/Stone.tga", "Data/Dirt.tga", "Data/Alpha01.tga");
 	if (!result)
 	{
 		MessageBox(hwnd, L"Could not initialize the Model object.", L"Error", MB_OK);
@@ -107,18 +108,18 @@ bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 		return false;
 	}
 
-	// Create the MutliTextureShader object
-	m_MultiTextureShader = new MultiTextureShaderClass;
-	if (!m_MultiTextureShader)
+	// Create the AlphaMapShader object
+	m_AlphaMapShader = new AlphaMapShaderClass;
+	if (!m_AlphaMapShader)
 	{
 		return false;
 	}
 
-	// Initialize the MultiTextureShader object
-	result = m_MultiTextureShader->Initialize(m_Direct3D->GetDevice(), hwnd);
+	// Initialize the AlphaMapShader object
+	result = m_AlphaMapShader->Initialize(m_Direct3D->GetDevice(), hwnd);
 	if (!result)
 	{
-		MessageBox(hwnd, L"Could not initialize the MultiTextureShader object.", L"Error", MB_OK);
+		MessageBox(hwnd, L"Could not initialize the AlphaMapShader object.", L"Error", MB_OK);
 		return false;
 	}
 
@@ -127,12 +128,12 @@ bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 
 void GraphicsClass::Shutdown()
 {
-	// Release the MultiTextureShader object.
-	if (m_MultiTextureShader)
+	// Release the AlphaMapShader object.
+	if (m_AlphaMapShader)
 	{
-		m_MultiTextureShader->Shutdown();
-		delete m_MultiTextureShader;
-		m_MultiTextureShader = 0;
+		m_AlphaMapShader->Shutdown();
+		delete m_AlphaMapShader;
+		m_AlphaMapShader = 0;
 	}
 
 	// Release the Frustum object.
@@ -254,8 +255,8 @@ bool GraphicsClass::Render()
 			// Put the model vertex and index buffers on the graphics pipeline to prepare them for drawing.
 			m_Model->Render(m_Direct3D->GetDeviceContext());
 
-			// Render the model using the MultiTextureShader.
-			m_MultiTextureShader->Render(m_Direct3D->GetDeviceContext(), m_Model->GetIndexCount(),
+			// Render the model using the LightMapShader.
+			m_AlphaMapShader->Render(m_Direct3D->GetDeviceContext(), m_Model->GetIndexCount(),
 				worldMatrix, viewMatrix, projectionMatrix, m_Model->GetTextureArray());
 
 			// Reset to the original world matrix.
@@ -277,7 +278,7 @@ bool GraphicsClass::Render()
 	m_Direct3D->TurnZBufferOff();
 
 	// Turn on the alpha blending before rendering the text.
-	m_Direct3D->TurnOnAlphaBlending();
+	m_Direct3D->EnableAlphaBlending();
 
 	// Render the text strings.
 	result = m_Text->Render(m_Direct3D->GetDeviceContext(), worldMatrix, orthoMatrix);
@@ -287,7 +288,7 @@ bool GraphicsClass::Render()
 	}
 
 	// Turn off alpha blending after rendering the text.
-	m_Direct3D->TurnOffAlphaBlending();
+	m_Direct3D->DisableAlphaBlending();
 
 	// Turn the Z buffer back on now that all 2D rendering has completed
 	m_Direct3D->TurnZBufferOn();

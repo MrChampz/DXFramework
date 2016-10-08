@@ -17,7 +17,7 @@
 #include "ModelClass.h"
 #include "ModelListClass.h"
 #include "FrustumClass.h"
-#include "MultiTextureShaderClass.h"
+#include "AlphaMapShaderClass.h"
 
 /////////////////////////////////////////////
 //	GLOBALS
@@ -49,5 +49,5 @@ private:
 	ModelClass* m_Model;
 	ModelListClass* m_ModelList;
 	FrustumClass* m_Frustum;
-	MultiTextureShaderClass* m_MultiTextureShader;
+	AlphaMapShaderClass* m_AlphaMapShader;
 };
