@@ -117,6 +117,18 @@
     <ClCompile Include="TerrainShaderClass.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="SkyDomeClass.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="SkyDomeShaderClass.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="TerrainCellClass.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="MiniMapClass.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="SystemClass.h">
@@ -218,6 +230,18 @@
     <ClInclude Include="TerrainShaderClass.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="SkyDomeClass.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SkyDomeShaderClass.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="TerrainCellClass.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="MiniMapClass.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Shaders\Color.ps">
@@ -266,6 +290,12 @@
       <Filter>Shaders</Filter>
     </None>
     <None Include="Shaders\Terrain.vs">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="Shaders\SkyDome.ps">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="Shaders\SkyDome.vs">
       <Filter>Shaders</Filter>
     </None>
   </ItemGroup>

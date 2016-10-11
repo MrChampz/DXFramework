@@ -15,7 +15,10 @@
 #include "CameraClass.h"
 #include "LightClass.h"
 #include "PositionClass.h"
+#include "FrustumClass.h"
+#include "SkyDomeClass.h"
 #include "TerrainClass.h"
+#include "ModelClass.h"
 
 /////////////////////////////////////////////
 //	Class name: ZoneClass
@@ -40,7 +43,11 @@ private:
 	CameraClass* m_Camera;
 	LightClass* m_Light;
 	PositionClass* m_Position;
+	FrustumClass* m_Frustum;
+	SkyDomeClass* m_SkyDome;
 	TerrainClass* m_Terrain;
-	bool m_displayUI, m_wireFrame;
+	bool m_displayUI, m_wireFrame, m_cellLines, m_heightLocked;
+	ModelClass* m_Model;
+	float m_modelPosX = 0, m_modelPosY = 0, m_modelPosZ = 0;
 };
 

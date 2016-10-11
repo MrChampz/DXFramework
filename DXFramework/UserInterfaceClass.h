@@ -6,9 +6,8 @@
 /////////////////////////////////////////////
 //	MY INCLUDES
 /////////////////////////////////////////////
-#include "D3DClass.h"
-#include "ShaderManagerClass.h"
 #include "TextClass.h"
+#include "MiniMapClass.h"
 
 /////////////////////////////////////////////
 //	Class name: UserInterfaceClass
@@ -23,8 +22,10 @@ public:
 	bool Initialize(D3DClass*, int, int);
 	void Shutdown();
 
-	bool Frame(ID3D11DeviceContext*, int, float, float, float, float, float, float);
+	bool Frame(ID3D11DeviceContext*, int, float, float, float, float, float, float, float, float);
 	bool Render(D3DClass*, ShaderManagerClass*, XMMATRIX, XMMATRIX, XMMATRIX);
+
+	bool UpdateRenderCounts(ID3D11DeviceContext*, int, int, int);
 
 private:
 	bool UpdateFpsString(ID3D11DeviceContext*, int);
@@ -32,7 +33,8 @@ private:
 
 private:
 	FontClass* m_Font1;
-	TextClass *m_FpsString, *m_VideoStrings, *m_PositionStrings;
+	TextClass *m_FpsString, *m_VideoStrings, *m_PositionStrings, *m_RenderCountStrings;
+	MiniMapClass* m_MiniMap;
 	int m_previousFps;
 	int m_previousPosition[6];
 };

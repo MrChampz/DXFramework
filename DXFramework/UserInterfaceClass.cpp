@@ -9,6 +9,8 @@ UserInterfaceClass::UserInterfaceClass()
 	m_FpsString = 0;
 	m_VideoStrings = 0;
 	m_PositionStrings = 0;
+	m_RenderCountStrings = 0;
+	m_MiniMap = 0;
 }
 
 UserInterfaceClass::UserInterfaceClass(const UserInterfaceClass& other)
@@ -147,9 +149,52 @@ bool UserInterfaceClass::Initialize(D3DClass* Direct3D, int screenWidth, int scr
 	}
 
 	// Initialize the previous frame position.
-	for (i = 0; i<6; i++)
+	for (i = 0; i < 6; i++)
 	{
 		m_previousPosition[i] = -1;
+	}
+
+	// Create the text objects for the render count strings.
+	m_RenderCountStrings = new TextClass[3];
+	if (!m_RenderCountStrings)
+	{
+		return false;
+	}
+
+	// Initialize the render count strings.
+	result = m_RenderCountStrings[0].Initialize(Direct3D->GetDevice(), Direct3D->GetDeviceContext(), screenWidth,
+		screenHeight, 32, false, m_Font1, "Polys Drawn: 0", 10, 260, 1.0f, 1.0f, 1.0f);
+	if (!result)
+	{
+		return false;
+	}
+
+	result = m_RenderCountStrings[1].Initialize(Direct3D->GetDevice(), Direct3D->GetDeviceContext(), screenWidth,
+		screenHeight, 32, false, m_Font1, "Cells Drawn: 0", 10, 280, 1.0f, 1.0f, 1.0f);
+	if (!result)
+	{
+		return false;
+	}
+
+	result = m_RenderCountStrings[2].Initialize(Direct3D->GetDevice(), Direct3D->GetDeviceContext(), screenWidth,
+		screenHeight, 32, false, m_Font1, "Cells Culled: 0", 10, 300, 1.0f, 1.0f, 1.0f);
+	if (!result)
+	{
+		return false;
+	}
+
+	// Create the mini-map object.
+	m_MiniMap = new MiniMapClass;
+	if (!m_MiniMap)
+	{
+		return false;
+	}
+
+	// Initialize the mini-map object.
+	result = m_MiniMap->Initialize(Direct3D->GetDevice(), Direct3D->GetDeviceContext(), screenWidth, screenHeight, 1025, 1025);
+	if (!m_MiniMap)
+	{
+		return false;
 	}
 
 	return true;
@@ -158,6 +203,25 @@ bool UserInterfaceClass::Initialize(D3DClass* Direct3D, int screenWidth, int scr
 
 void UserInterfaceClass::Shutdown()
 {
+	// Release the mini-map object.
+	if (m_MiniMap)
+	{
+		m_MiniMap->Shutdown();
+		delete m_MiniMap;
+		m_MiniMap = 0;
+	}
+
+	// Release the render count strings.
+	if (m_RenderCountStrings)
+	{
+		m_RenderCountStrings[0].Shutdown();
+		m_RenderCountStrings[1].Shutdown();
+		m_RenderCountStrings[2].Shutdown();
+
+		delete[] m_RenderCountStrings;
+		m_RenderCountStrings = 0;
+	}
+
 	// Release the position text strings.
 	if (m_PositionStrings)
 	{
@@ -204,7 +268,7 @@ void UserInterfaceClass::Shutdown()
 
 
 bool UserInterfaceClass::Frame(ID3D11DeviceContext* deviceContext, int fps, float posX, float posY, float posZ,
-	float rotX, float rotY, float rotZ)
+	float rotX, float rotY, float rotZ, float enemyPosX, float enemyPosZ)
 {
 	bool result;
 
@@ -223,6 +287,10 @@ bool UserInterfaceClass::Frame(ID3D11DeviceContext* deviceContext, int fps, floa
 		return false;
 	}
 
+	// Update the mini-map position indicator.
+	m_MiniMap->PointPositionUpdate(posX, posZ, rotY);
+	m_MiniMap->EnemyPositionUpdate(enemyPosX, enemyPosZ);
+
 	return true;
 }
 
@@ -231,26 +299,44 @@ bool UserInterfaceClass::Render(D3DClass* Direct3D, ShaderManagerClass* ShaderMa
 	XMMATRIX orthoMatrix)
 {
 	int i;
-
+	bool result;
 
 	// Turn off the Z buffer and enable alpha blending to begin 2D rendering.
 	Direct3D->TurnZBufferOff();
 	Direct3D->EnableAlphaBlending();
 
 	// Render the fps string.
-	m_FpsString->Render(Direct3D->GetDeviceContext(), ShaderManager, worldMatrix, viewMatrix, orthoMatrix, m_Font1->GetTexture());
+	m_FpsString->Render(Direct3D->GetDeviceContext(), ShaderManager, worldMatrix, viewMatrix, orthoMatrix,
+		m_Font1->GetTexture());
 
 	// Render the video card strings.
-	m_VideoStrings[0].Render(Direct3D->GetDeviceContext(), ShaderManager, worldMatrix, viewMatrix, orthoMatrix, m_Font1->GetTexture());
-	m_VideoStrings[1].Render(Direct3D->GetDeviceContext(), ShaderManager, worldMatrix, viewMatrix, orthoMatrix, m_Font1->GetTexture());
+	m_VideoStrings[0].Render(Direct3D->GetDeviceContext(), ShaderManager, worldMatrix, viewMatrix, orthoMatrix,
+		m_Font1->GetTexture());
+	m_VideoStrings[1].Render(Direct3D->GetDeviceContext(), ShaderManager, worldMatrix, viewMatrix, orthoMatrix,
+		m_Font1->GetTexture());
 
 	// Render the position and rotation strings.
-	for (i = 0; i<6; i++)
+	for (i = 0; i < 6; i++)
 	{
-		m_PositionStrings[i].Render(Direct3D->GetDeviceContext(), ShaderManager, worldMatrix, viewMatrix, orthoMatrix, m_Font1->GetTexture());
+		m_PositionStrings[i].Render(Direct3D->GetDeviceContext(), ShaderManager, worldMatrix, viewMatrix, orthoMatrix,
+			m_Font1->GetTexture());
 	}
 
-	// Turn off alpha blending now that the text has been rendered.
+	// Render the render count strings.
+	for (i = 0; i < 3; i++)
+	{
+		m_RenderCountStrings[i].Render(Direct3D->GetDeviceContext(), ShaderManager, worldMatrix, viewMatrix, orthoMatrix,
+			m_Font1->GetTexture());
+	}
+
+	// Render the mini-map.
+	result = m_MiniMap->Render(Direct3D->GetDeviceContext(), ShaderManager, worldMatrix, viewMatrix, orthoMatrix);
+	if (!result)
+	{
+		return false;
+	}
+
+	// Turn off alpha blending
 	Direct3D->DisableAlphaBlending();
 
 	// Turn the Z buffer back on now that the 2D rendering has completed.
@@ -401,6 +487,59 @@ bool UserInterfaceClass::UpdatePositionStrings(ID3D11DeviceContext* deviceContex
 		strcat_s(finalString, tempString);
 		result = m_PositionStrings[5].UpdateSentence(deviceContext, m_Font1, finalString, 10, 220, 1.0f, 1.0f, 1.0f);
 		if (!result) { return false; }
+	}
+
+	return true;
+}
+
+bool UserInterfaceClass::UpdateRenderCounts(ID3D11DeviceContext* deviceContext, int renderCount, int nodesDrawn,
+	int nodesCulled)
+{
+	char tempString[32];
+	char finalString[32];
+	bool result;
+
+
+	// Convert the render count integer to string format.
+	_itoa_s(renderCount, tempString, 10);
+
+	// Setup the render count string.
+	strcpy_s(finalString, "Polys Drawn: ");
+	strcat_s(finalString, tempString);
+
+	// Update the sentence vertex buffer with the new string information.
+	result = m_RenderCountStrings[0].UpdateSentence(deviceContext, m_Font1, finalString, 10, 260, 1.0f, 1.0f, 1.0f);
+	if (!result)
+	{
+		return false;
+	}
+
+	// Convert the cells drawn integer to string format.
+	_itoa_s(nodesDrawn, tempString, 10);
+
+	// Setup the cells drawn string.
+	strcpy_s(finalString, "Cells Drawn: ");
+	strcat_s(finalString, tempString);
+
+	// Update the sentence vertex buffer with the new string information.
+	result = m_RenderCountStrings[1].UpdateSentence(deviceContext, m_Font1, finalString, 10, 280, 1.0f, 1.0f, 1.0f);
+	if (!result)
+	{
+		return false;
+	}
+
+	// Convert the cells culled integer to string format.
+	_itoa_s(nodesCulled, tempString, 10);
+
+	// Setup the cells culled string.
+	strcpy_s(finalString, "Cells Culled: ");
+	strcat_s(finalString, tempString);
+
+	// Update the sentence vertex buffer with the new string information.
+	result = m_RenderCountStrings[2].UpdateSentence(deviceContext, m_Font1, finalString, 10, 300, 1.0f, 1.0f, 1.0f);
+	if (!result)
+	{
+		return false;
 	}
 
 	return true;

@@ -360,3 +360,60 @@ bool InputClass::IsF2Toggled()
 
 	return false;
 }
+
+bool InputClass::IsF3Toggled()
+{
+	// Do a bitwise and on the keyboard state to check if the key is currently being pressed.
+	if (m_keyboardState[DIK_F3] & 0x80)
+	{
+		if (m_F3_released)
+		{
+			m_F3_released = false;
+			return true;
+		}
+	}
+	else
+	{
+		m_F3_released = true;
+	}
+
+	return false;
+}
+
+bool InputClass::IsF4Toggled()
+{
+	// Do a bitwise and on the keyboard state to check if the key is currently being pressed.
+	if (m_keyboardState[DIK_F4] & 0x80)
+	{
+		if (m_F4_released)
+		{
+			m_F4_released = false;
+			return true;
+		}
+	}
+	else
+	{
+		m_F4_released = true;
+	}
+
+	return false;
+}
+
+bool InputClass::IsMouseLeftToggled()
+{
+	// Do a bitwise and on the mouse state to check if the button is currently being pressed.
+	if (m_mouseState.rgbButtons[0] & 0x80)
+	{
+		if (m_MouseLeft_released)
+		{
+			m_MouseLeft_released = false;
+			return true;
+		}
+	}
+	else
+	{
+		m_MouseLeft_released = true;
+	}
+
+	return false;
+}

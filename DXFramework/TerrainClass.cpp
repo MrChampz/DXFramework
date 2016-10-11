@@ -5,12 +5,11 @@
 
 TerrainClass::TerrainClass()
 {
-	m_vertexBuffer = 0;
-	m_indexBuffer = 0;
 	m_terrainFilename = 0;
 	m_colorMapFilename = 0;
 	m_heightMap = 0;
 	m_terrainModel = 0;
+	m_TerrainCells = 0;
 }
 
 TerrainClass::TerrainClass(const TerrainClass& other)
@@ -32,8 +31,8 @@ bool TerrainClass::Initialize(ID3D11Device* device, char* setupFilename)
 		return false;
 	}
 
-	// Initialize the terrain height map with the data from the bitmap file
-	result = LoadBitmapHeightMap();
+	// Initialize the terrain height map with the data from the raw file
+	result = LoadRawHeightMap();
 	if (!result)
 	{
 		return false;
@@ -69,8 +68,8 @@ bool TerrainClass::Initialize(ID3D11Device* device, char* setupFilename)
 	// Calculate the tangent and binormal for the terrain model
 	CalculateTerrainVectors();
 
-	// Load the rendering buffers with the terrain data.
-	result = InitializeBuffers(device);
+	// Create and load the cells with the terrain data.
+	result = LoadTerrainCells(device);
 	if (!result)
 	{
 		return false;
@@ -84,8 +83,8 @@ bool TerrainClass::Initialize(ID3D11Device* device, char* setupFilename)
 
 void TerrainClass::Shutdown()
 {
-	// Release the rendering buffers.
-	ShutdownBuffers();
+	// Release the terrein cells
+	ShutdownTerrainCells();
 
 	// Release the terrain model
 	ShutdownTerrainModel();
@@ -96,17 +95,12 @@ void TerrainClass::Shutdown()
 	return;
 }
 
-bool TerrainClass::Render(ID3D11DeviceContext* deviceContext)
+void TerrainClass::Frame()
 {
-	// Put the vertex and index buffers on the graphics pipeline to prepare them for drawing.
-	RenderBuffers(deviceContext);
-
-	return true;
-}
-
-int TerrainClass::GetIndexCount()
-{
-	return m_indexCount;
+	m_renderCount = 0;
+	m_cellsDrawn = 0;
+	m_cellsCulled = 0;
+	return;
 }
 
 bool TerrainClass::LoadSetupFile(char* filename)
@@ -193,66 +187,39 @@ bool TerrainClass::LoadSetupFile(char* filename)
 	return true;
 }
 
-bool TerrainClass::LoadBitmapHeightMap()
+bool TerrainClass::LoadRawHeightMap()
 {
-	int error, imageSize, i, j, k, index;
+	int error, i, j, index;
 	FILE* filePtr;
-	unsigned long long count;
-	BITMAPFILEHEADER bitmapFileHeader;
-	BITMAPINFOHEADER bitmapInfoHeader;
-	unsigned char* bitmapImage;
-	unsigned char height;
+	unsigned long long imageSize, count;
+	unsigned short* rawImage;
 
-	// Start by creating the array structure to hold the height map data
+	// Create the float array to hold the height map data
 	m_heightMap = new HeightMapType[m_terrainWidth * m_terrainHeight];
 	if (!m_heightMap)
 	{
 		return false;
 	}
 
-	// Open the bitmap map file in binary
+	// Open the 16 bit raw height map file for reading in binary
 	error = fopen_s(&filePtr, m_terrainFilename, "rb");
 	if (error != 0)
 	{
 		return false;
 	}
 
-	// Read in the bitmap file header
-	count = fread(&bitmapFileHeader, sizeof(BITMAPFILEHEADER), 1, filePtr);
-	if (count != 1)
+	// Calculate the size of the raw image data
+	imageSize = m_terrainHeight * m_terrainWidth;
+
+	// Allocate memory for the raw image data
+	rawImage = new unsigned short[imageSize];
+	if (!rawImage)
 	{
 		return false;
 	}
 
-	// Read in the bitmap info header
-	count = fread(&bitmapInfoHeader, sizeof(BITMAPINFOHEADER), 1, filePtr);
-	if (count != 1)
-	{
-		return false;
-	}
-
-	// Make sure the height map dimensions are the same as the terrain dimensions foe easy 1 to 1 mapping
-	if ((bitmapInfoHeader.biHeight != m_terrainHeight) || (bitmapInfoHeader.biWidth != m_terrainWidth))
-	{
-		return false;
-	}
-
-	// Calculate the size of the bitmap image data
-	// Since we use non-divide by 2 dimensions (eg. 257 x 257) we need to add an extra byte to each line
-	imageSize = m_terrainHeight * ((m_terrainWidth * 3) + 1);
-
-	// Allocate memory for the bitmap image data
-	bitmapImage = new unsigned char[imageSize];
-	if (!bitmapImage)
-	{
-		return false;
-	}
-
-	// Move to the beginning of the bitmap data
-	fseek(filePtr, bitmapFileHeader.bfOffBits, SEEK_SET);
-
-	// Read in the bitmap image data
-	count = fread(bitmapImage, 1, imageSize, filePtr);
+	// Read in the raw image data
+	count = fread(rawImage, sizeof(unsigned short), imageSize, filePtr);
 	if (count != imageSize)
 	{
 		return false;
@@ -265,36 +232,23 @@ bool TerrainClass::LoadBitmapHeightMap()
 		return false;
 	}
 
-	// Initialize the position in the image data buffer
-	k = 0;
-
-	// Read the image data into the height map array
+	// Copy the image data into the height map array
 	for (j = 0; j < m_terrainHeight; j++)
 	{
 		for (i = 0; i < m_terrainWidth; i++)
 		{
-			// Bitmaps are upside down so load bottom to top into the height map array
-			index = (m_terrainWidth * (m_terrainHeight - 1 - j)) + i;
+			index = (m_terrainWidth * j) + i;
 
-			// Get the grey scale pixel value from the bitmap image data at this location
-			height = bitmapImage[k];
-
-			// Store the pixel value as the height at this point in the height map array
-			m_heightMap[index].y = (float)height;
-
-			// Increment the bitmap image data index
-			k += 3;
+			// Store the height at this point in the height map array
+			m_heightMap[index].y = (float)rawImage[index];
 		}
-
-		// Compensate for the extra byte at end of each line in non-divide by 2 bitmaps (eg. 257 x 257)
-		k++;
 	}
 
-	// Release the bitmap image data now that the height map array has been loaded
-	delete[] bitmapImage;
-	bitmapImage = 0;
+	// Release the raw image data
+	delete[] rawImage;
+	rawImage = 0;
 
-	// Release the terrain filename now that is has been read in
+	// Release the terrain filename now that it has been read in
 	delete[] m_terrainFilename;
 	m_terrainFilename = 0;
 
@@ -830,134 +784,322 @@ void TerrainClass::CalculateTangentBinormal(TempVertexType vertex1, TempVertexTy
 	return;
 }
 
-bool TerrainClass::InitializeBuffers(ID3D11Device* device)
+bool TerrainClass::LoadTerrainCells(ID3D11Device* device)
 {
-	VertexType* vertices;
-	unsigned long* indices;
-	D3D11_BUFFER_DESC vertexBufferDesc, indexBufferDesc;
-	D3D11_SUBRESOURCE_DATA vertexData, indexData;
-	HRESULT result;
-	int i;
+	int cellHeight, cellWidth, cellRowCount, i, j, index;
+	bool result;
 
-	// Calculate the number of vertices in the terrain.
-	m_vertexCount = (m_terrainWidth - 1) * (m_terrainHeight - 1) * 6;
+	// Set the height and width of each terrain cell to a fixed 11x11 vertex array
+	cellHeight = 11;
+	cellWidth = 11;
 
-	// Set the index count to the same as the vertex count.
-	m_indexCount = m_vertexCount;
+	// Calculate the number of cells needed to store the terrain data
+	cellRowCount = (m_terrainWidth - 1) / (cellWidth - 1);
+	m_cellCount = cellRowCount * cellRowCount;
 
-	// Create the vertex array.
-	vertices = new VertexType[m_vertexCount];
-	if (!vertices)
+	// Create the terrain cell array
+	m_TerrainCells = new TerrainCellClass[m_cellCount];
+	if (!m_TerrainCells)
 	{
 		return false;
 	}
 
-	// Create the index array.
-	indices = new unsigned long[m_indexCount];
-	if (!indices)
+	// Loop through and initialize all the terrain cells
+	for (j = 0; j < cellRowCount; j++)
 	{
-		return false;
+		for (i = 0; i < cellRowCount; i++)
+		{
+			index = (cellRowCount * j) + i;
+
+			result = m_TerrainCells[index].Initialize(device, m_terrainModel, i, j, cellHeight, cellWidth, m_terrainWidth);
+			if (!result)
+			{
+				return false;
+			}
+		}
 	}
-
-	// Load the vertex array and index array with 3D terrain model data.
-	for (i = 0; i < m_vertexCount; i++)
-	{
-		vertices[i].position = XMFLOAT3(m_terrainModel[i].x, m_terrainModel[i].y, m_terrainModel[i].z);
-		vertices[i].texture = XMFLOAT2(m_terrainModel[i].tu, m_terrainModel[i].tv);
-		vertices[i].normal = XMFLOAT3(m_terrainModel[i].nx, m_terrainModel[i].ny, m_terrainModel[i].nz);
-		vertices[i].color = XMFLOAT3(m_terrainModel[i].r, m_terrainModel[i].g, m_terrainModel[i].b);
-		vertices[i].tangent = XMFLOAT3(m_terrainModel[i].tx, m_terrainModel[i].ty, m_terrainModel[i].tz);
-		vertices[i].binormal = XMFLOAT3(m_terrainModel[i].bx, m_terrainModel[i].by, m_terrainModel[i].bz);
-		indices[i] = i;
-	}
-
-	// Set up the description of the static vertex buffer.
-	vertexBufferDesc.Usage = D3D11_USAGE_DEFAULT;
-	vertexBufferDesc.ByteWidth = sizeof(VertexType) * m_vertexCount;
-	vertexBufferDesc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
-	vertexBufferDesc.CPUAccessFlags = 0;
-	vertexBufferDesc.MiscFlags = 0;
-	vertexBufferDesc.StructureByteStride = 0;
-
-	// Give the subresource structure a pointer to the vertex data.
-	vertexData.pSysMem = vertices;
-	vertexData.SysMemPitch = 0;
-	vertexData.SysMemSlicePitch = 0;
-
-	// Now create the vertex buffer.
-	result = device->CreateBuffer(&vertexBufferDesc, &vertexData, &m_vertexBuffer);
-	if (FAILED(result))
-	{
-		return false;
-	}
-
-	// Set up the description of the static index buffer.
-	indexBufferDesc.Usage = D3D11_USAGE_DEFAULT;
-	indexBufferDesc.ByteWidth = sizeof(unsigned long) * m_indexCount;
-	indexBufferDesc.BindFlags = D3D11_BIND_INDEX_BUFFER;
-	indexBufferDesc.CPUAccessFlags = 0;
-	indexBufferDesc.MiscFlags = 0;
-	indexBufferDesc.StructureByteStride = 0;
-
-	// Give the subresource structure a pointer to the index data.
-	indexData.pSysMem = indices;
-	indexData.SysMemPitch = 0;
-	indexData.SysMemSlicePitch = 0;
-
-	// Create the index buffer.
-	result = device->CreateBuffer(&indexBufferDesc, &indexData, &m_indexBuffer);
-	if (FAILED(result))
-	{
-		return false;
-	}
-
-	// Release the arrays now that the buffers have been created and loaded.
-	delete[] vertices;
-	vertices = 0;
-
-	delete[] indices;
-	indices = 0;
 
 	return true;
 }
 
-void TerrainClass::ShutdownBuffers()
+void TerrainClass::ShutdownTerrainCells()
 {
-	// Release the index buffer.
-	if (m_indexBuffer)
-	{
-		m_indexBuffer->Release();
-		m_indexBuffer = 0;
-	}
+	int i;
 
-	// Release the vertex buffer.
-	if (m_vertexBuffer)
+	// Release the terrain cell array.
+	if (m_TerrainCells)
 	{
-		m_vertexBuffer->Release();
-		m_vertexBuffer = 0;
+		for (i = 0; i < m_cellCount; i++)
+		{
+			m_TerrainCells[i].Shutdown();
+		}
+
+		delete[] m_TerrainCells;
+		m_TerrainCells = 0;
 	}
 
 	return;
 }
 
-void TerrainClass::RenderBuffers(ID3D11DeviceContext* deviceContext)
+bool TerrainClass::CheckHeightOfTriangle(float x, float z, float& height, float v0[3], float v1[3], float v2[3])
 {
-	unsigned int stride;
-	unsigned int offset;
+	float startVector[3], directionVector[3], edge1[3], edge2[3], normal[3];
+	float Q[3], e1[3], e2[3], e3[3], edgeNormal[3], temp[3];
+	float magnitude, D, denominator, numerator, t, determinant;
 
 
-	// Set vertex buffer stride and offset.
-	stride = sizeof(VertexType);
-	offset = 0;
+	// Starting position of the ray that is being cast.
+	startVector[0] = x;
+	startVector[1] = 0.0f;
+	startVector[2] = z;
 
-	// Set the vertex buffer to active in the input assembler so it can be rendered.
-	deviceContext->IASetVertexBuffers(0, 1, &m_vertexBuffer, &stride, &offset);
+	// The direction the ray is being cast.
+	directionVector[0] = 0.0f;
+	directionVector[1] = -1.0f;
+	directionVector[2] = 0.0f;
 
-	// Set the index buffer to active in the input assembler so it can be rendered.
-	deviceContext->IASetIndexBuffer(m_indexBuffer, DXGI_FORMAT_R32_UINT, 0);
+	// Calculate the two edges from the three points given.
+	edge1[0] = v1[0] - v0[0];
+	edge1[1] = v1[1] - v0[1];
+	edge1[2] = v1[2] - v0[2];
 
-	// Set the type of primitive that should be rendered from this vertex buffer, in this case lines.
-	deviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+	edge2[0] = v2[0] - v0[0];
+	edge2[1] = v2[1] - v0[1];
+	edge2[2] = v2[2] - v0[2];
 
+	// Calculate the normal of the triangle from the two edges.
+	normal[0] = (edge1[1] * edge2[2]) - (edge1[2] * edge2[1]);
+	normal[1] = (edge1[2] * edge2[0]) - (edge1[0] * edge2[2]);
+	normal[2] = (edge1[0] * edge2[1]) - (edge1[1] * edge2[0]);
+
+	magnitude = (float)sqrt((normal[0] * normal[0]) + (normal[1] * normal[1]) + (normal[2] * normal[2]));
+	normal[0] = normal[0] / magnitude;
+	normal[1] = normal[1] / magnitude;
+	normal[2] = normal[2] / magnitude;
+
+	// Find the distance from the origin to the plane.
+	D = ((-normal[0] * v0[0]) + (-normal[1] * v0[1]) + (-normal[2] * v0[2]));
+
+	// Get the denominator of the equation.
+	denominator = ((normal[0] * directionVector[0]) + (normal[1] * directionVector[1]) + (normal[2] * directionVector[2]));
+
+	// Make sure the result doesn't get too close to zero to prevent divide by zero.
+	if (fabs(denominator) < 0.0001f)
+	{
+		return false;
+	}
+
+	// Get the numerator of the equation.
+	numerator = -1.0f * (((normal[0] * startVector[0]) + (normal[1] * startVector[1]) + (normal[2] * startVector[2])) + D);
+
+	// Calculate where we intersect the triangle.
+	t = numerator / denominator;
+
+	// Find the intersection vector.
+	Q[0] = startVector[0] + (directionVector[0] * t);
+	Q[1] = startVector[1] + (directionVector[1] * t);
+	Q[2] = startVector[2] + (directionVector[2] * t);
+
+	// Find the three edges of the triangle.
+	e1[0] = v1[0] - v0[0];
+	e1[1] = v1[1] - v0[1];
+	e1[2] = v1[2] - v0[2];
+
+	e2[0] = v2[0] - v1[0];
+	e2[1] = v2[1] - v1[1];
+	e2[2] = v2[2] - v1[2];
+
+	e3[0] = v0[0] - v2[0];
+	e3[1] = v0[1] - v2[1];
+	e3[2] = v0[2] - v2[2];
+
+	// Calculate the normal for the first edge.
+	edgeNormal[0] = (e1[1] * normal[2]) - (e1[2] * normal[1]);
+	edgeNormal[1] = (e1[2] * normal[0]) - (e1[0] * normal[2]);
+	edgeNormal[2] = (e1[0] * normal[1]) - (e1[1] * normal[0]);
+
+	// Calculate the determinant to see if it is on the inside, outside, or directly on the edge.
+	temp[0] = Q[0] - v0[0];
+	temp[1] = Q[1] - v0[1];
+	temp[2] = Q[2] - v0[2];
+
+	determinant = ((edgeNormal[0] * temp[0]) + (edgeNormal[1] * temp[1]) + (edgeNormal[2] * temp[2]));
+
+	// Check if it is outside.
+	if (determinant > 0.001f)
+	{
+		return false;
+	}
+
+	// Calculate the normal for the second edge.
+	edgeNormal[0] = (e2[1] * normal[2]) - (e2[2] * normal[1]);
+	edgeNormal[1] = (e2[2] * normal[0]) - (e2[0] * normal[2]);
+	edgeNormal[2] = (e2[0] * normal[1]) - (e2[1] * normal[0]);
+
+	// Calculate the determinant to see if it is on the inside, outside, or directly on the edge.
+	temp[0] = Q[0] - v1[0];
+	temp[1] = Q[1] - v1[1];
+	temp[2] = Q[2] - v1[2];
+
+	determinant = ((edgeNormal[0] * temp[0]) + (edgeNormal[1] * temp[1]) + (edgeNormal[2] * temp[2]));
+
+	// Check if it is outside.
+	if (determinant > 0.001f)
+	{
+		return false;
+	}
+
+	// Calculate the normal for the third edge.
+	edgeNormal[0] = (e3[1] * normal[2]) - (e3[2] * normal[1]);
+	edgeNormal[1] = (e3[2] * normal[0]) - (e3[0] * normal[2]);
+	edgeNormal[2] = (e3[0] * normal[1]) - (e3[1] * normal[0]);
+
+	// Calculate the determinant to see if it is on the inside, outside, or directly on the edge.
+	temp[0] = Q[0] - v2[0];
+	temp[1] = Q[1] - v2[1];
+	temp[2] = Q[2] - v2[2];
+
+	determinant = ((edgeNormal[0] * temp[0]) + (edgeNormal[1] * temp[1]) + (edgeNormal[2] * temp[2]));
+
+	// Check if it is outside.
+	if (determinant > 0.001f)
+	{
+		return false;
+	}
+
+	// Now we have our height.
+	height = Q[1];
+
+	return true;
+}
+
+bool TerrainClass::RenderCell(ID3D11DeviceContext* deviceContext, int cellId, FrustumClass* Frustum)
+{
+	float maxWidth, maxHeight, maxDepth, minWidth, minHeight, minDepth;
+	bool result;
+
+	// Get the dimensions of the terrain cell.
+	m_TerrainCells[cellId].GetCellDimensions(maxWidth, maxHeight, maxDepth, minWidth, minHeight, minDepth);
+
+	// Check if the cell is visible.  If it is not visible then just return and don't render it.
+	result = Frustum->CheckRectangle2(maxWidth, maxHeight, maxDepth, minWidth, minHeight, minDepth);
+	if (!result)
+	{
+		// Increment the number of cells that were culled.
+		m_cellsCulled++;
+
+		return false;
+	}
+
+	// If it is visible then render it.
+	m_TerrainCells[cellId].Render(deviceContext);
+
+	// Add the polygons in the cell to the render count.
+	m_renderCount += (m_TerrainCells[cellId].GetVertexCount() / 3);
+
+	// Increment the number of cells that were actually drawn.
+	m_cellsDrawn++;
+
+	return true;
+}
+
+
+void TerrainClass::RenderCellLines(ID3D11DeviceContext* deviceContext, int cellId)
+{
+	m_TerrainCells[cellId].RenderLineBuffers(deviceContext);
 	return;
+}
+
+
+int TerrainClass::GetCellIndexCount(int cellId)
+{
+	return m_TerrainCells[cellId].GetIndexCount();
+}
+
+
+int TerrainClass::GetCellLinesIndexCount(int cellId)
+{
+	return m_TerrainCells[cellId].GetLineBuffersIndexCount();
+}
+
+
+int TerrainClass::GetCellCount()
+{
+	return m_cellCount;
+}
+
+int TerrainClass::GetRenderCount()
+{
+	return m_renderCount;
+}
+
+
+int TerrainClass::GetCellsDrawn()
+{
+	return m_cellsDrawn;
+}
+
+
+int TerrainClass::GetCellsCulled()
+{
+	return m_cellsCulled;
+}
+
+bool TerrainClass::GetHeightAtPosition(float inputX, float inputZ, float& height)
+{
+	int i, cellId, index;
+	float vertex1[3], vertex2[3], vertex3[3];
+	bool foundHeight;
+	float maxWidth, maxHeight, maxDepth, minWidth, minHeight, minDepth;
+
+
+	// Loop through all of the terrain cells to find out which one the inputX and inputZ would be inside.
+	cellId = -1;
+	for (i = 0; i < m_cellCount; i++)
+	{
+		// Get the current cell dimensions.
+		m_TerrainCells[i].GetCellDimensions(maxWidth, maxHeight, maxDepth, minWidth, minHeight, minDepth);
+
+		// Check to see if the positions are in this cell.
+		if ((inputX < maxWidth) && (inputX > minWidth) && (inputZ < maxDepth) && (inputZ > minDepth))
+		{
+			cellId = i;
+			i = m_cellCount;
+		}
+	}
+
+	// If we didn't find a cell then the input position is off the terrain grid.
+	if (cellId == -1)
+	{
+		return false;
+	}
+
+	// If this is the right cell then check all the triangles in this cell to see what the height of the triangle at this position is.
+	for (i = 0; i < (m_TerrainCells[cellId].GetVertexCount() / 3); i++)
+	{
+		index = i * 3;
+
+		vertex1[0] = m_TerrainCells[cellId].m_vertexList[index].x;
+		vertex1[1] = m_TerrainCells[cellId].m_vertexList[index].y;
+		vertex1[2] = m_TerrainCells[cellId].m_vertexList[index].z;
+		index++;
+
+		vertex2[0] = m_TerrainCells[cellId].m_vertexList[index].x;
+		vertex2[1] = m_TerrainCells[cellId].m_vertexList[index].y;
+		vertex2[2] = m_TerrainCells[cellId].m_vertexList[index].z;
+		index++;
+
+		vertex3[0] = m_TerrainCells[cellId].m_vertexList[index].x;
+		vertex3[1] = m_TerrainCells[cellId].m_vertexList[index].y;
+		vertex3[2] = m_TerrainCells[cellId].m_vertexList[index].z;
+
+		// Check to see if this is the polygon we are looking for.
+		foundHeight = CheckHeightOfTriangle(inputX, inputZ, height, vertex1, vertex2, vertex3);
+		if (foundHeight)
+		{
+			return true;
+		}
+	}
+
+	return false;
 }

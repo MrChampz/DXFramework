@@ -14,6 +14,12 @@ using namespace DirectX;
 using namespace std;
 
 /////////////////////////////////////////////
+//	MY INCLUDES
+/////////////////////////////////////////////
+#include "TerrainCellClass.h"
+#include "FrustumClass.h"
+
+/////////////////////////////////////////////
 //	Class name: TerrainClass
 /////////////////////////////////////////////
 class TerrainClass
@@ -65,13 +71,23 @@ public:
 
 	bool Initialize(ID3D11Device*, char*);
 	void Shutdown();
-	bool Render(ID3D11DeviceContext*);
+	void Frame();
 
-	int GetIndexCount();
+	bool RenderCell(ID3D11DeviceContext*, int, FrustumClass*);
+	void RenderCellLines(ID3D11DeviceContext*, int);
+
+	int GetCellIndexCount(int);
+	int GetCellLinesIndexCount(int);
+	int GetCellCount();
+	int GetRenderCount();
+	int GetCellsDrawn();
+	int GetCellsCulled();
+
+	bool GetHeightAtPosition(float, float, float&);
 
 private:
 	bool LoadSetupFile(char*);
-	bool LoadBitmapHeightMap();
+	bool LoadRawHeightMap();
 	void ShutdownHeightMap();
 	void SetTerrainCoordinates();
 	bool CalculateNormals();
@@ -82,17 +98,18 @@ private:
 	void CalculateTerrainVectors();
 	void CalculateTangentBinormal(TempVertexType, TempVertexType, TempVertexType, VectorType&, VectorType&);
 
-	bool InitializeBuffers(ID3D11Device*);
-	void ShutdownBuffers();
-	void RenderBuffers(ID3D11DeviceContext*);
+	bool LoadTerrainCells(ID3D11Device*);
+	void ShutdownTerrainCells();
+
+	bool CheckHeightOfTriangle(float, float, float&, float[3], float[3], float[3]);
 
 private:
-	ID3D11Buffer *m_vertexBuffer, *m_indexBuffer;
-	int m_vertexCount, m_indexCount;
-	int m_terrainHeight, m_terrainWidth;
+	int m_terrainHeight, m_terrainWidth, m_vertexCount;
 	float m_heightScale;
 	char *m_terrainFilename, *m_colorMapFilename;
 	HeightMapType* m_heightMap;
 	ModelType* m_terrainModel;
+	TerrainCellClass* m_TerrainCells;
+	int m_cellCount, m_renderCount, m_cellsDrawn, m_cellsCulled;
 };
 
