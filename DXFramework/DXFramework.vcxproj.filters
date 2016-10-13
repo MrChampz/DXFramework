@@ -129,6 +129,21 @@
     <ClCompile Include="MiniMapClass.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="ReflectionShaderClass.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="WaterClass.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="WaterShaderClass.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="CubeMapClass.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="MiniMapShaderClass.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="SystemClass.h">
@@ -242,6 +257,21 @@
     <ClInclude Include="MiniMapClass.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="ReflectionShaderClass.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="WaterClass.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="WaterShaderClass.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CubeMapClass.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="MiniMapShaderClass.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Shaders\Color.ps">
@@ -296,6 +326,25 @@
       <Filter>Shaders</Filter>
     </None>
     <None Include="Shaders\SkyDome.vs">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="Shaders\Reflection.ps">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="Shaders\Reflection.vs">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="Shaders\Water.vs">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="Shaders\Water.ps">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="packages.config" />
+    <None Include="Shaders\MiniMap.ps">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="Shaders\MiniMap.vs">
       <Filter>Shaders</Filter>
     </None>
   </ItemGroup>

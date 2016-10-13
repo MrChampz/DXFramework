@@ -94,7 +94,7 @@ bool ZoneClass::Initialize(D3DClass* Direct3D, HWND hwnd, int screenWidth, int s
 	}
 
 	// Initialize the skydome object
-	result = m_SkyDome->Initialize(Direct3D->GetDevice());
+	result = m_SkyDome->Initialize(Direct3D->GetDevice(), Direct3D->GetDeviceContext());
 	if (!result)
 	{
 		MessageBox(hwnd, L"Could not initialize the SkyDome object", L"Error", MB_OK);
@@ -136,10 +136,10 @@ bool ZoneClass::Initialize(D3DClass* Direct3D, HWND hwnd, int screenWidth, int s
 	m_displayUI = true;
 
 	// Set wire frame rendering initially to enabled
-	m_wireFrame = true;
+	m_wireFrame = false;
 
 	// Set the rendering of cell lines initially to enabled.
-	m_cellLines = true;
+	m_cellLines = false;
 
 	// Set the user locked to the terrain height for movement
 	m_heightLocked = true;
@@ -372,7 +372,7 @@ bool ZoneClass::Render(D3DClass* Direct3D, ShaderManagerClass* ShaderManager, Te
 	// Render the sky dome using the sky dome shader.
 	m_SkyDome->Render(Direct3D->GetDeviceContext());
 	result = ShaderManager->RenderSkyDomeShader(Direct3D->GetDeviceContext(), m_SkyDome->GetIndexCount(), worldMatrix, viewMatrix,
-		projectionMatrix, m_SkyDome->GetApexColor(), m_SkyDome->GetCenterColor());
+		projectionMatrix, m_SkyDome->GetApexColor(), m_SkyDome->GetCenterColor(), m_SkyDome->GetCubeMap());
 	if (!result)
 	{
 		return false;

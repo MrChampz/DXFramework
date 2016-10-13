@@ -23,7 +23,7 @@ struct VertexInputType
 struct PixelInputType
 {
 	float4 position : SV_POSITION;
-	float4 domePosition : TEXCOORD0;
+	float3 tex : TEXCOORD0;
 };
 
 /////////////////////////////////////////////
@@ -41,8 +41,8 @@ PixelInputType SkyDomeVertexShader(VertexInputType input)
     output.position = mul(output.position, viewMatrix);
     output.position = mul(output.position, projectionMatrix);
 
-	// Send the unmodified position through to the pixel shader
-    output.domePosition = input.position;
+	// Send the unmodified position, without w value, through to the pixel shader
+	output.tex = input.position.xyz;
 
     return output;
 }

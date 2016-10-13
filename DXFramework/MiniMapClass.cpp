@@ -152,7 +152,7 @@ bool MiniMapClass::Render(ID3D11DeviceContext* deviceContext, ShaderManagerClass
 	}
 
 	// Render the frame bitmap using the texture shader.
-	result = ShaderManager->RenderTextureShader(deviceContext, m_FrameBitmap->GetIndexCount(), worldMatrix, viewMatrix,
+	result = ShaderManager->RenderMiniMapShader(deviceContext, m_FrameBitmap->GetIndexCount(), worldMatrix, viewMatrix,
 		orthoMatrix, m_FrameBitmap->GetTexture());
 	if (!result)
 	{
@@ -182,7 +182,7 @@ bool MiniMapClass::Render(ID3D11DeviceContext* deviceContext, ShaderManagerClass
 	}
 
 	// Render the enemy bitmap using the texture shader.
-	result = ShaderManager->RenderTextureShader(deviceContext, m_EnemyBitmap->GetIndexCount(), worldMatrix, viewMatrix,
+	result = ShaderManager->RenderMiniMapShader(deviceContext, m_EnemyBitmap->GetIndexCount(), worldMatrix, viewMatrix,
 		orthoMatrix, m_EnemyBitmap->GetTexture());
 	if (!result)
 	{
@@ -197,7 +197,7 @@ bool MiniMapClass::Render(ID3D11DeviceContext* deviceContext, ShaderManagerClass
 	}
 
 	// Render the point bitmap using the texture shader.
-	result = ShaderManager->RenderTextureShader(deviceContext, m_PointBitmap->GetIndexCount(), worldMatrix, viewMatrix,
+	result = ShaderManager->RenderMiniMapShader(deviceContext, m_PointBitmap->GetIndexCount(), worldMatrix, viewMatrix,
 		orthoMatrix, m_PointBitmap->GetTexture());
 	if (!result)
 	{

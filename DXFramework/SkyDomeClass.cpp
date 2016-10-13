@@ -5,6 +5,7 @@
 
 SkyDomeClass::SkyDomeClass()
 {
+	m_CubeMap = 0;
 	m_model = 0;
 	m_vertexBuffer = 0;
 	m_indexBuffer = 0;
@@ -18,12 +19,19 @@ SkyDomeClass::~SkyDomeClass()
 {
 }
 
-bool SkyDomeClass::Initialize(ID3D11Device* device)
+bool SkyDomeClass::Initialize(ID3D11Device* device, ID3D11DeviceContext* deviceContext)
 {
 	bool result;
 
 	// Load in the model data
 	result = LoadSkyDomeModel("Data/SkyDome/SkyDome.vin");
+	if (!result)
+	{
+		return false;
+	}
+
+	// Load in the cubemap
+	result = LoadCubeMap(device, deviceContext, L"Data/SkyDome/CubeMap.dds");
 	if (!result)
 	{
 		return false;
@@ -50,6 +58,9 @@ void SkyDomeClass::Shutdown()
 	// Release the vertex and index buffer that were used for rendering the sky dome.
 	ReleaseBuffers();
 
+	// Release the CubeMap object
+	ReleaseCubeMap();
+
 	// Release the sky dome model.
 	ReleaseSkyDomeModel();
 
@@ -62,6 +73,11 @@ void SkyDomeClass::Render(ID3D11DeviceContext* deviceContext)
 	RenderBuffers(deviceContext);
 
 	return;
+}
+
+ID3D11ShaderResourceView* SkyDomeClass::GetCubeMap()
+{
+	return m_CubeMap->GetCubeMap();
 }
 
 int SkyDomeClass::GetIndexCount()
@@ -263,6 +279,40 @@ void SkyDomeClass::ReleaseSkyDomeModel()
 	{
 		delete[] m_model;
 		m_model = 0;
+	}
+
+	return;
+}
+
+bool SkyDomeClass::LoadCubeMap(ID3D11Device* device, ID3D11DeviceContext* deviceContext, wchar_t* filename)
+{
+	bool result;
+
+	// Create the CubeMap object
+	m_CubeMap = new CubeMapClass;
+	if (!m_CubeMap)
+	{
+		return false;
+	}
+
+	// Initialize the CubeMap object
+	result = m_CubeMap->Initialize(device, deviceContext, filename);
+	if (!result)
+	{
+		return false;
+	}
+
+	return true;
+}
+
+void SkyDomeClass::ReleaseCubeMap()
+{
+	// Release the CubeMap
+	if (m_CubeMap)
+	{
+		m_CubeMap->Shutdown();
+		delete[] m_CubeMap;
+		m_CubeMap = 0;
 	}
 
 	return;
