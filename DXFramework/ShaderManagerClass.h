@@ -29,26 +29,26 @@ public:
 	ShaderManagerClass(const ShaderManagerClass&);
 	~ShaderManagerClass();
 
-	bool Initialize(ID3D11Device*, HWND);
+	bool Initialize(ID3D10Device*, HWND);
 	void Shutdown();
 
-	bool RenderColorShader(ID3D11DeviceContext*, int, XMMATRIX, XMMATRIX, XMMATRIX);
-	bool RenderTextureShader(ID3D11DeviceContext*, int, XMMATRIX, XMMATRIX, XMMATRIX, ID3D11ShaderResourceView*);
-	bool RenderBumpMapShader(ID3D11DeviceContext*, int, XMMATRIX, XMMATRIX, XMMATRIX, ID3D11ShaderResourceView**,
+	bool RenderColorShader(ID3D10Device*, int, XMMATRIX, XMMATRIX, XMMATRIX);
+	bool RenderTextureShader(ID3D10Device*, int, XMMATRIX, XMMATRIX, XMMATRIX, ID3D10ShaderResourceView*);
+	bool RenderBumpMapShader(ID3D10Device*, int, XMMATRIX, XMMATRIX, XMMATRIX, ID3D10ShaderResourceView**,
 		XMFLOAT3, XMFLOAT4);
-	bool RenderSpecMapShader(ID3D11DeviceContext*, int, XMMATRIX, XMMATRIX, XMMATRIX, ID3D11ShaderResourceView**,
+	bool RenderSpecMapShader(ID3D10Device*, int, XMMATRIX, XMMATRIX, XMMATRIX, ID3D10ShaderResourceView**,
 		XMFLOAT3, XMFLOAT4, XMFLOAT3, XMFLOAT4, float);
-	bool RenderLightShader(ID3D11DeviceContext*, int, XMMATRIX, XMMATRIX, XMMATRIX, ID3D11ShaderResourceView*,
+	bool RenderLightShader(ID3D10Device*, int, XMMATRIX, XMMATRIX, XMMATRIX, ID3D10ShaderResourceView*,
 		XMFLOAT3, XMFLOAT3, XMFLOAT4);
-	bool RenderReflectionShader(ID3D11DeviceContext*, int, XMMATRIX, XMMATRIX, XMMATRIX, ID3D11ShaderResourceView*,
-		ID3D11ShaderResourceView*, XMFLOAT4, XMFLOAT3, float, XMFLOAT4);
-	bool RenderFontShader(ID3D11DeviceContext*, int, XMMATRIX, XMMATRIX, XMMATRIX, ID3D11ShaderResourceView*, XMFLOAT4);
-	bool RenderMiniMapShader(ID3D11DeviceContext*, int, XMMATRIX, XMMATRIX, XMMATRIX, ID3D11ShaderResourceView*);
-	bool RenderSkyDomeShader(ID3D11DeviceContext*, int, XMMATRIX, XMMATRIX, XMMATRIX, ID3D11ShaderResourceView*);
-	bool RenderWaterShader(ID3D11DeviceContext*, int, XMMATRIX, XMMATRIX, XMMATRIX, XMMATRIX, ID3D11ShaderResourceView*,
-		ID3D11ShaderResourceView*, ID3D11ShaderResourceView*, XMFLOAT3, XMFLOAT2, float, float, XMFLOAT4, XMFLOAT3, float);
-	bool RenderTerrainShader(ID3D11DeviceContext*, int, XMMATRIX, XMMATRIX, XMMATRIX, ID3D11ShaderResourceView*,
-		ID3D11ShaderResourceView*, XMFLOAT3, XMFLOAT4);
+	bool RenderReflectionShader(ID3D10Device*, int, XMMATRIX, XMMATRIX, XMMATRIX, ID3D10ShaderResourceView*,
+		ID3D10ShaderResourceView*, XMFLOAT4, XMFLOAT3, float, XMFLOAT4);
+	bool RenderFontShader(ID3D10Device*, int, XMMATRIX, XMMATRIX, XMMATRIX, ID3D10ShaderResourceView*, XMFLOAT4);
+	bool RenderMiniMapShader(ID3D10Device*, int, XMMATRIX, XMMATRIX, XMMATRIX, ID3D10ShaderResourceView*);
+	bool RenderSkyDomeShader(ID3D10Device*, int, XMMATRIX, XMMATRIX, XMMATRIX, ID3D10ShaderResourceView*);
+	bool RenderWaterShader(ID3D10Device*, int, XMMATRIX, XMMATRIX, XMMATRIX, XMMATRIX, ID3D10ShaderResourceView*,
+		ID3D10ShaderResourceView*, ID3D10ShaderResourceView*, XMFLOAT3, XMFLOAT2, float, float, XMFLOAT4, XMFLOAT3, float);
+	bool RenderTerrainShader(ID3D10Device*, int, XMMATRIX, XMMATRIX, XMMATRIX, ID3D10ShaderResourceView*,
+		ID3D10ShaderResourceView*, XMFLOAT3, XMFLOAT4);
 
 private:
 	ColorShaderClass* m_ColorShader;

@@ -16,7 +16,7 @@ CubeMapClass::~CubeMapClass()
 {
 }
 
-bool CubeMapClass::Initialize(ID3D11Device* device, ID3D11DeviceContext* deviceContext, wchar_t* filename)
+bool CubeMapClass::Initialize(ID3D10Device* device, wchar_t* filename)
 {
 	HRESULT result;
 
@@ -43,7 +43,7 @@ void CubeMapClass::Shutdown()
 	return;
 }
 
-ID3D11ShaderResourceView* CubeMapClass::GetCubeMap()
+ID3D10ShaderResourceView* CubeMapClass::GetCubeMap()
 {
 	return m_textureView;
 }

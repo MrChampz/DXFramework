@@ -50,12 +50,12 @@ void TextureManagerClass::Shutdown()
 	return;
 }
 
-bool TextureManagerClass::LoadTexture(ID3D11Device* device, ID3D11DeviceContext* deviceContext, char* filename, int location)
+bool TextureManagerClass::LoadTexture(ID3D10Device* device, char* filename, int location)
 {
 	bool result;
 
 	// Initialize the color texture object
-	result = m_TextureArray[location].Initialize(device, deviceContext, filename);
+	result = m_TextureArray[location].Initialize(device, filename);
 	if (!result)
 	{
 		return false;
@@ -64,7 +64,7 @@ bool TextureManagerClass::LoadTexture(ID3D11Device* device, ID3D11DeviceContext*
 	return true;
 }
 
-ID3D11ShaderResourceView* TextureManagerClass::GetTexture(int id)
+ID3D10ShaderResourceView* TextureManagerClass::GetTexture(int id)
 {
 	return m_TextureArray[id].GetTexture();
 }

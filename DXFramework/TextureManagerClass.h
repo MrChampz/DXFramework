@@ -21,9 +21,9 @@ public:
 	bool Initialize(int);
 	void Shutdown();
 
-	bool LoadTexture(ID3D11Device*, ID3D11DeviceContext*, char*, int);
+	bool LoadTexture(ID3D10Device*, char*, int);
 
-	ID3D11ShaderResourceView* GetTexture(int);
+	ID3D10ShaderResourceView* GetTexture(int);
 
 private:
 	TextureClass* m_TextureArray;

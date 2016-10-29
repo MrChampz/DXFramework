@@ -6,8 +6,8 @@
 /////////////////////////////////////////////
 //	INCLUDES
 /////////////////////////////////////////////
-#include <d3d11.h>
 #include <DirectXMath.h>
+#include <d3d10.h>
 #include <fstream>
 using namespace DirectX;
 using namespace std;
@@ -58,19 +58,19 @@ public:
 	ModelClass(const ModelClass&);
 	~ModelClass();
 
-	bool Initialize(ID3D11Device*, ID3D11DeviceContext*, char*, char*, char*, char*);
+	bool Initialize(ID3D10Device*, char*, char*, char*, char*);
 	void Shutdown();
-	void Render(ID3D11DeviceContext*);
+	void Render(ID3D10Device*);
 
 	int GetIndexCount();
-	ID3D11ShaderResourceView** GetTextureArray();
+	ID3D10ShaderResourceView** GetTextureArray();
 
 private:
-	bool InitializeBuffers(ID3D11Device*);
+	bool InitializeBuffers(ID3D10Device*);
 	void ShutdownBuffers();
-	void RenderBuffers(ID3D11DeviceContext*);
+	void RenderBuffers(ID3D10Device*);
 
-	bool LoadTextures(ID3D11Device*, ID3D11DeviceContext*, char*, char*, char*);
+	bool LoadTextures(ID3D10Device*, char*, char*, char*);
 	void ReleaseTextures();
 
 	bool LoadModel(char*);
@@ -81,7 +81,7 @@ private:
 	void CalculateNormal(VectorType, VectorType, VectorType&);
 
 private:
-	ID3D11Buffer *m_vertexBuffer, *m_indexBuffer;
+	ID3D10Buffer *m_vertexBuffer, *m_indexBuffer;
 	int m_vertexCount, m_indexCount;
 	TextureArrayClass* m_TextureArray;
 	ModelType* m_model;

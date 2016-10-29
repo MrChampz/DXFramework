@@ -18,8 +18,7 @@ WaterClass::~WaterClass()
 {
 }
 
-bool WaterClass::Initialize(ID3D11Device* device, ID3D11DeviceContext* deviceContext,
-	char* textureFilename, float waterHeight, float waterRadius)
+bool WaterClass::Initialize(ID3D10Device* device, char* textureFilename, float waterHeight, float waterRadius)
 {
 	bool result;
 
@@ -34,7 +33,7 @@ bool WaterClass::Initialize(ID3D11Device* device, ID3D11DeviceContext* deviceCon
 	}
 
 	// Load the texture for this model.
-	result = LoadTexture(device, deviceContext, textureFilename);
+	result = LoadTexture(device, textureFilename);
 	if (!result)
 	{
 		return false;
@@ -82,10 +81,10 @@ void WaterClass::Frame()
 	return;
 }
 
-void WaterClass::Render(ID3D11DeviceContext* deviceContext)
+void WaterClass::Render(ID3D10Device* device)
 {
 	// Put the vertex and index buffers on the graphics pipeline to prepare them for drawing
-	RenderBuffers(deviceContext);
+	RenderBuffers(device);
 
 	return;
 }
@@ -95,7 +94,7 @@ int WaterClass::GetIndexCount()
 	return m_indexCount;
 }
 
-ID3D11ShaderResourceView* WaterClass::GetTexture()
+ID3D10ShaderResourceView* WaterClass::GetTexture()
 {
 	return m_Texture->GetTexture();
 }
@@ -130,12 +129,12 @@ float WaterClass::GetSpecularShininess()
 	return m_specularShininess;
 }
 
-bool WaterClass::InitializeBuffers(ID3D11Device* device, float waterRadius)
+bool WaterClass::InitializeBuffers(ID3D10Device* device, float waterRadius)
 {
 	VertexType* vertices;
 	unsigned long* indices;
-	D3D11_BUFFER_DESC vertexBufferDesc, indexBufferDesc;
-	D3D11_SUBRESOURCE_DATA vertexData, indexData;
+	D3D10_BUFFER_DESC vertexBufferDesc, indexBufferDesc;
+	D3D10_SUBRESOURCE_DATA vertexData, indexData;
 	HRESULT result;
 	int i;
 
@@ -187,12 +186,11 @@ bool WaterClass::InitializeBuffers(ID3D11Device* device, float waterRadius)
 	indices[5] = 5;
 
 	// Set up the description of the static vertex buffer
-	vertexBufferDesc.Usage = D3D11_USAGE_DEFAULT;
+	vertexBufferDesc.Usage = D3D10_USAGE_DEFAULT;
 	vertexBufferDesc.ByteWidth = sizeof(VertexType) * m_vertexCount;
-	vertexBufferDesc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
+	vertexBufferDesc.BindFlags = D3D10_BIND_VERTEX_BUFFER;
 	vertexBufferDesc.CPUAccessFlags = 0;
 	vertexBufferDesc.MiscFlags = 0;
-	vertexBufferDesc.StructureByteStride = 0;
 
 	// Give the subresource structure a pointer to the vertex data
 	vertexData.pSysMem = vertices;
@@ -207,12 +205,11 @@ bool WaterClass::InitializeBuffers(ID3D11Device* device, float waterRadius)
 	}
 
 	// Set up the description of the static index buffer
-	indexBufferDesc.Usage = D3D11_USAGE_DEFAULT;
+	indexBufferDesc.Usage = D3D10_USAGE_DEFAULT;
 	indexBufferDesc.ByteWidth = sizeof(unsigned long) * m_indexCount;
-	indexBufferDesc.BindFlags = D3D11_BIND_INDEX_BUFFER;
+	indexBufferDesc.BindFlags = D3D10_BIND_INDEX_BUFFER;
 	indexBufferDesc.CPUAccessFlags = 0;
 	indexBufferDesc.MiscFlags = 0;
-	indexBufferDesc.StructureByteStride = 0;
 
 	// Give the subresource structure a pointer to the index data
 	indexData.pSysMem = indices;
@@ -255,7 +252,7 @@ void WaterClass::ShutdownBuffers()
 	return;
 }
 
-void WaterClass::RenderBuffers(ID3D11DeviceContext* deviceContext)
+void WaterClass::RenderBuffers(ID3D10Device* device)
 {
 	unsigned int stride;
 	unsigned int offset;
@@ -265,18 +262,18 @@ void WaterClass::RenderBuffers(ID3D11DeviceContext* deviceContext)
 	offset = 0;
 
 	// Set the vertex buffer to active in the input assembler so it can be rendered
-	deviceContext->IASetVertexBuffers(0, 1, &m_vertexBuffer, &stride, &offset);
+	device->IASetVertexBuffers(0, 1, &m_vertexBuffer, &stride, &offset);
 
 	// Set the index buffer to active in the input assembler so it can be rendered
-	deviceContext->IASetIndexBuffer(m_indexBuffer, DXGI_FORMAT_R32_UINT, 0);
+	device->IASetIndexBuffer(m_indexBuffer, DXGI_FORMAT_R32_UINT, 0);
 
 	// Set the type of primitive that should be rendered from this vertex buffer, in this case triangles
-	deviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+	device->IASetPrimitiveTopology(D3D10_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
 	return;
 }
 
-bool WaterClass::LoadTexture(ID3D11Device* device, ID3D11DeviceContext* deviceContext, char* filename)
+bool WaterClass::LoadTexture(ID3D10Device* device, char* filename)
 {
 	bool result;
 
@@ -288,7 +285,7 @@ bool WaterClass::LoadTexture(ID3D11Device* device, ID3D11DeviceContext* deviceCo
 	}
 
 	// Initialize the Texture object
-	result = m_Texture->Initialize(device, deviceContext, filename);
+	result = m_Texture->Initialize(device, filename);
 	if (!result)
 	{
 		return false;

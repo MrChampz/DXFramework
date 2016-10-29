@@ -6,8 +6,8 @@
 /////////////////////////////////////////////
 //	INCLUDES
 /////////////////////////////////////////////
-#include <d3d11.h>
 #include <DirectXMath.h>
+#include <d3d10.h>
 #include <fstream>
 #include <stdio.h>
 using namespace DirectX;
@@ -69,13 +69,13 @@ public:
 	TerrainClass(const TerrainClass&);
 	~TerrainClass();
 
-	bool Initialize(ID3D11Device*, char*);
+	bool Initialize(ID3D10Device*, char*);
 	void Shutdown();
 	void Frame();
 
-	bool RenderCell(ID3D11DeviceContext*, int, FrustumClass*);
-	bool RenderAllCells(ID3D11DeviceContext*, int);
-	void RenderCellLines(ID3D11DeviceContext*, int);
+	bool RenderCell(ID3D10Device*, int, FrustumClass*);
+	bool RenderAllCells(ID3D10Device*, int);
+	void RenderCellLines(ID3D10Device*, int);
 
 	int GetCellIndexCount(int);
 	int GetCellLinesIndexCount(int);
@@ -99,7 +99,7 @@ private:
 	void CalculateTerrainVectors();
 	void CalculateTangentBinormal(TempVertexType, TempVertexType, TempVertexType, VectorType&, VectorType&);
 
-	bool LoadTerrainCells(ID3D11Device*);
+	bool LoadTerrainCells(ID3D10Device*);
 	void ShutdownTerrainCells();
 
 	bool CheckHeightOfTriangle(float, float, float&, float[3], float[3], float[3]);

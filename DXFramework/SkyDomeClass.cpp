@@ -19,7 +19,7 @@ SkyDomeClass::~SkyDomeClass()
 {
 }
 
-bool SkyDomeClass::Initialize(ID3D11Device* device, ID3D11DeviceContext* deviceContext)
+bool SkyDomeClass::Initialize(ID3D10Device* device)
 {
 	bool result;
 
@@ -31,7 +31,7 @@ bool SkyDomeClass::Initialize(ID3D11Device* device, ID3D11DeviceContext* deviceC
 	}
 
 	// Load in the cubemap
-	result = LoadCubeMap(device, deviceContext, L"Data/SkyDome/CubeMap.dds");
+	result = LoadCubeMap(device, L"Data/SkyDome/CubeMap.dds");
 	if (!result)
 	{
 		return false;
@@ -67,15 +67,15 @@ void SkyDomeClass::Shutdown()
 	return;
 }
 
-void SkyDomeClass::Render(ID3D11DeviceContext* deviceContext)
+void SkyDomeClass::Render(ID3D10Device* device)
 {
 	// Put the vertex and index buffers on the graphics pipeline to prepare them for drawing
-	RenderBuffers(deviceContext);
+	RenderBuffers(device);
 
 	return;
 }
 
-ID3D11ShaderResourceView* SkyDomeClass::GetCubeMap()
+ID3D10ShaderResourceView* SkyDomeClass::GetCubeMap()
 {
 	return m_CubeMap->GetCubeMap();
 }
@@ -95,12 +95,12 @@ XMFLOAT4 SkyDomeClass::GetCenterColor()
 	return m_centerColor;
 }
 
-bool SkyDomeClass::InitializeBuffers(ID3D11Device* device)
+bool SkyDomeClass::InitializeBuffers(ID3D10Device* device)
 {
 	VertexType* vertices;
 	unsigned long* indices;
-	D3D11_BUFFER_DESC vertexBufferDesc, indexBufferDesc;
-	D3D11_SUBRESOURCE_DATA vertexData, indexData;
+	D3D10_BUFFER_DESC vertexBufferDesc, indexBufferDesc;
+	D3D10_SUBRESOURCE_DATA vertexData, indexData;
 	HRESULT result;
 	int i;
 
@@ -126,12 +126,11 @@ bool SkyDomeClass::InitializeBuffers(ID3D11Device* device)
 	}
 
 	// Set up the description of the static vertex buffer
-	vertexBufferDesc.Usage = D3D11_USAGE_DEFAULT;
+	vertexBufferDesc.Usage = D3D10_USAGE_DEFAULT;
 	vertexBufferDesc.ByteWidth = sizeof(VertexType) * m_vertexCount;
-	vertexBufferDesc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
+	vertexBufferDesc.BindFlags = D3D10_BIND_VERTEX_BUFFER;
 	vertexBufferDesc.CPUAccessFlags = 0;
 	vertexBufferDesc.MiscFlags = 0;
-	vertexBufferDesc.StructureByteStride = 0;
 
 	// Give the subresource structure a pointer to the vertex data
 	vertexData.pSysMem = vertices;
@@ -146,12 +145,11 @@ bool SkyDomeClass::InitializeBuffers(ID3D11Device* device)
 	}
 
 	// Set up the description of the static index buffer
-	indexBufferDesc.Usage = D3D11_USAGE_DEFAULT;
+	indexBufferDesc.Usage = D3D10_USAGE_DEFAULT;
 	indexBufferDesc.ByteWidth = sizeof(unsigned long) * m_indexCount;
-	indexBufferDesc.BindFlags = D3D11_BIND_INDEX_BUFFER;
+	indexBufferDesc.BindFlags = D3D10_BIND_INDEX_BUFFER;
 	indexBufferDesc.CPUAccessFlags = 0;
 	indexBufferDesc.MiscFlags = 0;
-	indexBufferDesc.StructureByteStride = 0;
 
 	// Give the subresource structure a pointer to the index data
 	indexData.pSysMem = indices;
@@ -194,7 +192,7 @@ void SkyDomeClass::ReleaseBuffers()
 	return;
 }
 
-void SkyDomeClass::RenderBuffers(ID3D11DeviceContext* deviceContext)
+void SkyDomeClass::RenderBuffers(ID3D10Device* device)
 {
 	unsigned int stride;
 	unsigned int offset;
@@ -204,13 +202,13 @@ void SkyDomeClass::RenderBuffers(ID3D11DeviceContext* deviceContext)
 	offset = 0;
 
 	// Set the vertex buffer to active in the input assembler so it can be rendered
-	deviceContext->IASetVertexBuffers(0, 1, &m_vertexBuffer, &stride, &offset);
+	device->IASetVertexBuffers(0, 1, &m_vertexBuffer, &stride, &offset);
 
 	// Set the index buffer to active in the input assembler so it can be rendered
-	deviceContext->IASetIndexBuffer(m_indexBuffer, DXGI_FORMAT_R32_UINT, 0);
+	device->IASetIndexBuffer(m_indexBuffer, DXGI_FORMAT_R32_UINT, 0);
 
 	// Set the type of primitive that should be rendered from this vertex buffer, in this case triangles
-	deviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+	device->IASetPrimitiveTopology(D3D10_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
 	return;
 }
@@ -284,7 +282,7 @@ void SkyDomeClass::ReleaseSkyDomeModel()
 	return;
 }
 
-bool SkyDomeClass::LoadCubeMap(ID3D11Device* device, ID3D11DeviceContext* deviceContext, wchar_t* filename)
+bool SkyDomeClass::LoadCubeMap(ID3D10Device* device, wchar_t* filename)
 {
 	bool result;
 
@@ -296,7 +294,7 @@ bool SkyDomeClass::LoadCubeMap(ID3D11Device* device, ID3D11DeviceContext* device
 	}
 
 	// Initialize the CubeMap object
-	result = m_CubeMap->Initialize(device, deviceContext, filename);
+	result = m_CubeMap->Initialize(device, filename);
 	if (!result)
 	{
 		return false;

@@ -20,7 +20,7 @@ TerrainClass::~TerrainClass()
 {
 }
 
-bool TerrainClass::Initialize(ID3D11Device* device, char* setupFilename)
+bool TerrainClass::Initialize(ID3D10Device* device, char* setupFilename)
 {
 	bool result;
 
@@ -784,7 +784,7 @@ void TerrainClass::CalculateTangentBinormal(TempVertexType vertex1, TempVertexTy
 	return;
 }
 
-bool TerrainClass::LoadTerrainCells(ID3D11Device* device)
+bool TerrainClass::LoadTerrainCells(ID3D10Device* device)
 {
 	int cellHeight, cellWidth, cellRowCount, i, j, index;
 	bool result;
@@ -973,7 +973,7 @@ bool TerrainClass::CheckHeightOfTriangle(float x, float z, float& height, float 
 	return true;
 }
 
-bool TerrainClass::RenderCell(ID3D11DeviceContext* deviceContext, int cellId, FrustumClass* Frustum)
+bool TerrainClass::RenderCell(ID3D10Device* device, int cellId, FrustumClass* Frustum)
 {
 	float maxWidth, maxHeight, maxDepth, minWidth, minHeight, minDepth;
 	bool result;
@@ -992,7 +992,7 @@ bool TerrainClass::RenderCell(ID3D11DeviceContext* deviceContext, int cellId, Fr
 	}
 
 	// If it is visible then render it.
-	m_TerrainCells[cellId].Render(deviceContext);
+	m_TerrainCells[cellId].Render(device);
 
 	// Add the polygons in the cell to the render count.
 	m_renderCount += (m_TerrainCells[cellId].GetVertexCount() / 3);
@@ -1003,12 +1003,12 @@ bool TerrainClass::RenderCell(ID3D11DeviceContext* deviceContext, int cellId, Fr
 	return true;
 }
 
-bool TerrainClass::RenderAllCells(ID3D11DeviceContext* deviceContext, int cellId)
+bool TerrainClass::RenderAllCells(ID3D10Device* device, int cellId)
 {
 	bool result;
 
 	// If it is visible then render it.
-	m_TerrainCells[cellId].Render(deviceContext);
+	m_TerrainCells[cellId].Render(device);
 
 	// Add the polygons in the cell to the render count.
 	m_renderCount += (m_TerrainCells[cellId].GetVertexCount() / 3);
@@ -1019,24 +1019,21 @@ bool TerrainClass::RenderAllCells(ID3D11DeviceContext* deviceContext, int cellId
 	return true;
 }
 
-void TerrainClass::RenderCellLines(ID3D11DeviceContext* deviceContext, int cellId)
+void TerrainClass::RenderCellLines(ID3D10Device* device, int cellId)
 {
-	m_TerrainCells[cellId].RenderLineBuffers(deviceContext);
+	m_TerrainCells[cellId].RenderLineBuffers(device);
 	return;
 }
-
 
 int TerrainClass::GetCellIndexCount(int cellId)
 {
 	return m_TerrainCells[cellId].GetIndexCount();
 }
 
-
 int TerrainClass::GetCellLinesIndexCount(int cellId)
 {
 	return m_TerrainCells[cellId].GetLineBuffersIndexCount();
 }
-
 
 int TerrainClass::GetCellCount()
 {
@@ -1048,12 +1045,10 @@ int TerrainClass::GetRenderCount()
 	return m_renderCount;
 }
 
-
 int TerrainClass::GetCellsDrawn()
 {
 	return m_cellsDrawn;
 }
-
 
 int TerrainClass::GetCellsCulled()
 {

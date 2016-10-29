@@ -19,8 +19,7 @@ MiniMapClass::~MiniMapClass()
 {
 }
 
-bool MiniMapClass::Initialize(ID3D11Device* device, ID3D11DeviceContext* deviceContext, int screenWidth, int screenHeight,
-	float terrainWidth, float terrainHeight)
+bool MiniMapClass::Initialize(ID3D10Device* device, int screenWidth, int screenHeight, float terrainWidth, float terrainHeight)
 {
 	bool result;
 
@@ -47,7 +46,7 @@ bool MiniMapClass::Initialize(ID3D11Device* device, ID3D11DeviceContext* deviceC
 	}
 
 	// Initialize the frame bitmap object
-	result = m_FrameBitmap->Initialize(device, deviceContext, screenWidth, screenHeight, "Data/MiniMap/Frame.tga",
+	result = m_FrameBitmap->Initialize(device, screenWidth, screenHeight, "Data/MiniMap/Frame.tga",
 		170, 170);
 	if (!result)
 	{
@@ -62,8 +61,7 @@ bool MiniMapClass::Initialize(ID3D11Device* device, ID3D11DeviceContext* deviceC
 	}
 
 	// Initialize the mini-map bitmap object
-	result = m_MiniMapBitmap->Initialize(device, deviceContext, screenWidth, screenHeight, "Data/Maps/Map03/MiniMap.tga",
-		150, 150);
+	result = m_MiniMapBitmap->Initialize(device, screenWidth, screenHeight, "Data/Maps/Map03/MiniMap.tga", 150, 150);
 	if (!result)
 	{
 		return false;
@@ -77,8 +75,7 @@ bool MiniMapClass::Initialize(ID3D11Device* device, ID3D11DeviceContext* deviceC
 	}
 
 	// Initialize the enemy bitmap object
-	result = m_EnemyBitmap->Initialize(device, deviceContext, screenWidth, screenHeight, "Data/MiniMap/Enemy.tga",
-		11, 11);
+	result = m_EnemyBitmap->Initialize(device, screenWidth, screenHeight, "Data/MiniMap/Enemy.tga", 11, 11);
 	if (!result)
 	{
 		return false;
@@ -92,8 +89,7 @@ bool MiniMapClass::Initialize(ID3D11Device* device, ID3D11DeviceContext* deviceC
 	}
 
 	// Initialize the point bitmap object
-	result = m_PointBitmap->Initialize(device, deviceContext, screenWidth, screenHeight, "Data/MiniMap/Point.tga",
-		11, 11);
+	result = m_PointBitmap->Initialize(device, screenWidth, screenHeight, "Data/MiniMap/Point.tga", 11, 11);
 	if (!result)
 	{
 		return false;
@@ -139,20 +135,20 @@ void MiniMapClass::Shutdown()
 	return;
 }
 
-bool MiniMapClass::Render(ID3D11DeviceContext* deviceContext, ShaderManagerClass* ShaderManager, XMMATRIX worldMatrix,
+bool MiniMapClass::Render(ID3D10Device* device, ShaderManagerClass* ShaderManager, XMMATRIX worldMatrix,
 	XMMATRIX viewMatrix, XMMATRIX orthoMatrix)
 {
 	bool result;
 
 	// Put the frame bitmap vertex and index buffers on the graphics pipeline to prepare them for drawing.
-	result = m_FrameBitmap->Render(deviceContext, (m_mapLocationX - 10), (m_mapLocationY - 10));
+	result = m_FrameBitmap->Render(device, (m_mapLocationX - 10), (m_mapLocationY - 10));
 	if (!result)
 	{
 		return false;
 	}
 
 	// Render the frame bitmap using the texture shader.
-	result = ShaderManager->RenderMiniMapShader(deviceContext, m_FrameBitmap->GetIndexCount(), worldMatrix, viewMatrix,
+	result = ShaderManager->RenderMiniMapShader(device, m_FrameBitmap->GetIndexCount(), worldMatrix, viewMatrix,
 		orthoMatrix, m_FrameBitmap->GetTexture());
 	if (!result)
 	{
@@ -160,14 +156,14 @@ bool MiniMapClass::Render(ID3D11DeviceContext* deviceContext, ShaderManagerClass
 	}
 
 	// Put the mini-map bitmap vertex and index buffers on the graphics pipeline to prepare them for drawing.
-	result = m_MiniMapBitmap->Render(deviceContext, m_mapLocationX, m_mapLocationY);
+	result = m_MiniMapBitmap->Render(device, m_mapLocationX, m_mapLocationY);
 	if (!result)
 	{
 		return false;
 	}
 
 	// Render the mini-map bitmap using the texture shader.
-	result = ShaderManager->RenderTextureShader(deviceContext, m_MiniMapBitmap->GetIndexCount(), worldMatrix, viewMatrix,
+	result = ShaderManager->RenderTextureShader(device, m_MiniMapBitmap->GetIndexCount(), worldMatrix, viewMatrix,
 		orthoMatrix, m_MiniMapBitmap->GetTexture());
 	if (!result)
 	{
@@ -175,14 +171,14 @@ bool MiniMapClass::Render(ID3D11DeviceContext* deviceContext, ShaderManagerClass
 	}
 	
 	// Put the enemy bitmap vertex and index buffers on the graphics pipeline to prepare them for drawing.
-	result = m_EnemyBitmap->Render(deviceContext, m_enemyLocationX, m_enemyLocationY);
+	result = m_EnemyBitmap->Render(device, m_enemyLocationX, m_enemyLocationY);
 	if (!result)
 	{
 		return false;
 	}
 
 	// Render the enemy bitmap using the texture shader.
-	result = ShaderManager->RenderMiniMapShader(deviceContext, m_EnemyBitmap->GetIndexCount(), worldMatrix, viewMatrix,
+	result = ShaderManager->RenderMiniMapShader(device, m_EnemyBitmap->GetIndexCount(), worldMatrix, viewMatrix,
 		orthoMatrix, m_EnemyBitmap->GetTexture());
 	if (!result)
 	{
@@ -190,14 +186,14 @@ bool MiniMapClass::Render(ID3D11DeviceContext* deviceContext, ShaderManagerClass
 	}
 
 	// Put the point bitmap vertex and index buffers on the graphics pipeline to prepare them for drawing.
-	result = m_PointBitmap->Render(deviceContext, m_pointLocationX, m_pointLocationY);
+	result = m_PointBitmap->Render(device, m_pointLocationX, m_pointLocationY);
 	if (!result)
 	{
 		return false;
 	}
 
 	// Render the point bitmap using the texture shader.
-	result = ShaderManager->RenderMiniMapShader(deviceContext, m_PointBitmap->GetIndexCount(), worldMatrix, viewMatrix,
+	result = ShaderManager->RenderMiniMapShader(device, m_PointBitmap->GetIndexCount(), worldMatrix, viewMatrix,
 		orthoMatrix, m_PointBitmap->GetTexture());
 	if (!result)
 	{

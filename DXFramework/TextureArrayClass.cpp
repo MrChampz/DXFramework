@@ -20,15 +20,14 @@ TextureArrayClass::~TextureArrayClass()
 {
 }
 
-bool TextureArrayClass::Initialize(ID3D11Device* device, ID3D11DeviceContext* deviceContext,
-	char* filename1, char* filename2, char* filename3)
+bool TextureArrayClass::Initialize(ID3D10Device* device, char* filename1, char* filename2, char* filename3)
 {
 	bool result;
 	int height, width;
-	D3D11_TEXTURE2D_DESC textureDesc;
+	D3D10_TEXTURE2D_DESC textureDesc;
 	HRESULT hResult;
 	unsigned int rowPitch;
-	D3D11_SHADER_RESOURCE_VIEW_DESC srvDesc;
+	D3D10_SHADER_RESOURCE_VIEW_DESC srvDesc;
 
 	// Load the first texture
 	// Load the targa image data into memory
@@ -46,10 +45,10 @@ bool TextureArrayClass::Initialize(ID3D11Device* device, ID3D11DeviceContext* de
 	textureDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
 	textureDesc.SampleDesc.Count = 1;
 	textureDesc.SampleDesc.Quality = 0;
-	textureDesc.Usage = D3D11_USAGE_DEFAULT;
-	textureDesc.BindFlags = D3D11_BIND_SHADER_RESOURCE | D3D11_BIND_RENDER_TARGET;
+	textureDesc.Usage = D3D10_USAGE_DEFAULT;
+	textureDesc.BindFlags = D3D10_BIND_SHADER_RESOURCE | D3D10_BIND_RENDER_TARGET;
 	textureDesc.CPUAccessFlags = 0;
-	textureDesc.MiscFlags = D3D11_RESOURCE_MISC_GENERATE_MIPS;
+	textureDesc.MiscFlags = D3D10_RESOURCE_MISC_GENERATE_MIPS;
 
 	// Create the empty texture
 	hResult = device->CreateTexture2D(&textureDesc, NULL, &m_texture);
@@ -62,11 +61,11 @@ bool TextureArrayClass::Initialize(ID3D11Device* device, ID3D11DeviceContext* de
 	rowPitch = (width * 4) * sizeof(unsigned char);
 
 	// Copy the targa image data into the texture
-	deviceContext->UpdateSubresource(m_texture, 0, NULL, m_targaData, rowPitch, 0);
+	device->UpdateSubresource(m_texture, 0, NULL, m_targaData, rowPitch, 0);
 
 	// Setup the shader resource view description
 	srvDesc.Format = textureDesc.Format;
-	srvDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
+	srvDesc.ViewDimension = D3D10_SRV_DIMENSION_TEXTURE2D;
 	srvDesc.Texture2D.MostDetailedMip = 0;
 	srvDesc.Texture2D.MipLevels = -1;
 
@@ -78,7 +77,7 @@ bool TextureArrayClass::Initialize(ID3D11Device* device, ID3D11DeviceContext* de
 	}
 
 	// Generate mipmaps for this texture
-	deviceContext->GenerateMips(m_textureView[0]);
+	device->GenerateMips(m_textureView[0]);
 
 	// Release the targa image data now that the image data has been loaded into the texture
 	delete[] m_targaData;
@@ -100,10 +99,10 @@ bool TextureArrayClass::Initialize(ID3D11Device* device, ID3D11DeviceContext* de
 	textureDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
 	textureDesc.SampleDesc.Count = 1;
 	textureDesc.SampleDesc.Quality = 0;
-	textureDesc.Usage = D3D11_USAGE_DEFAULT;
-	textureDesc.BindFlags = D3D11_BIND_SHADER_RESOURCE | D3D11_BIND_RENDER_TARGET;
+	textureDesc.Usage = D3D10_USAGE_DEFAULT;
+	textureDesc.BindFlags = D3D10_BIND_SHADER_RESOURCE | D3D10_BIND_RENDER_TARGET;
 	textureDesc.CPUAccessFlags = 0;
-	textureDesc.MiscFlags = D3D11_RESOURCE_MISC_GENERATE_MIPS;
+	textureDesc.MiscFlags = D3D10_RESOURCE_MISC_GENERATE_MIPS;
 
 	// Create the empty texture
 	hResult = device->CreateTexture2D(&textureDesc, NULL, &m_texture);
@@ -116,11 +115,11 @@ bool TextureArrayClass::Initialize(ID3D11Device* device, ID3D11DeviceContext* de
 	rowPitch = (width * 4) * sizeof(unsigned char);
 
 	// Copy the targa image data into the texture
-	deviceContext->UpdateSubresource(m_texture, 0, NULL, m_targaData, rowPitch, 0);
+	device->UpdateSubresource(m_texture, 0, NULL, m_targaData, rowPitch, 0);
 
 	// Setup the shader resource view description
 	srvDesc.Format = textureDesc.Format;
-	srvDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
+	srvDesc.ViewDimension = D3D10_SRV_DIMENSION_TEXTURE2D;
 	srvDesc.Texture2D.MostDetailedMip = 0;
 	srvDesc.Texture2D.MipLevels = -1;
 
@@ -132,7 +131,7 @@ bool TextureArrayClass::Initialize(ID3D11Device* device, ID3D11DeviceContext* de
 	}
 
 	// Generate mipmaps for this texture
-	deviceContext->GenerateMips(m_textureView[1]);
+	device->GenerateMips(m_textureView[1]);
 
 	// Release the targa image data now that the image data has been loaded into the texture
 	delete[] m_targaData;
@@ -154,10 +153,10 @@ bool TextureArrayClass::Initialize(ID3D11Device* device, ID3D11DeviceContext* de
 	textureDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
 	textureDesc.SampleDesc.Count = 1;
 	textureDesc.SampleDesc.Quality = 0;
-	textureDesc.Usage = D3D11_USAGE_DEFAULT;
-	textureDesc.BindFlags = D3D11_BIND_SHADER_RESOURCE | D3D11_BIND_RENDER_TARGET;
+	textureDesc.Usage = D3D10_USAGE_DEFAULT;
+	textureDesc.BindFlags = D3D10_BIND_SHADER_RESOURCE | D3D10_BIND_RENDER_TARGET;
 	textureDesc.CPUAccessFlags = 0;
-	textureDesc.MiscFlags = D3D11_RESOURCE_MISC_GENERATE_MIPS;
+	textureDesc.MiscFlags = D3D10_RESOURCE_MISC_GENERATE_MIPS;
 
 	// Create the empty texture
 	hResult = device->CreateTexture2D(&textureDesc, NULL, &m_texture);
@@ -170,11 +169,11 @@ bool TextureArrayClass::Initialize(ID3D11Device* device, ID3D11DeviceContext* de
 	rowPitch = (width * 4) * sizeof(unsigned char);
 
 	// Copy the targa image data into the texture
-	deviceContext->UpdateSubresource(m_texture, 0, NULL, m_targaData, rowPitch, 0);
+	device->UpdateSubresource(m_texture, 0, NULL, m_targaData, rowPitch, 0);
 
 	// Setup the shader resource view description
 	srvDesc.Format = textureDesc.Format;
-	srvDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
+	srvDesc.ViewDimension = D3D10_SRV_DIMENSION_TEXTURE2D;
 	srvDesc.Texture2D.MostDetailedMip = 0;
 	srvDesc.Texture2D.MipLevels = -1;
 
@@ -186,7 +185,7 @@ bool TextureArrayClass::Initialize(ID3D11Device* device, ID3D11DeviceContext* de
 	}
 
 	// Generate mipmaps for this texture
-	deviceContext->GenerateMips(m_textureView[2]);
+	device->GenerateMips(m_textureView[2]);
 
 	// Release the targa image data now that the image data has been loaded into the texture
 	delete[] m_targaData;
@@ -235,7 +234,7 @@ void TextureArrayClass::Shutdown()
 	return;
 }
 
-ID3D11ShaderResourceView** TextureArrayClass::GetTextureArray()
+ID3D10ShaderResourceView** TextureArrayClass::GetTextureArray()
 {
 	return m_textureView;
 }

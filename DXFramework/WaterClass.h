@@ -6,8 +6,8 @@
 /////////////////////////////////////////////
 //	INCLUDES
 /////////////////////////////////////////////
-#include <d3d11.h>
 #include <DirectXMath.h>
+#include <d3d10.h>
 using namespace DirectX;
 
 /////////////////////////////////////////////
@@ -32,13 +32,13 @@ public:
 	WaterClass(const WaterClass&);
 	~WaterClass();
 
-	bool Initialize(ID3D11Device*, ID3D11DeviceContext*, char*, float, float);
+	bool Initialize(ID3D10Device*, char*, float, float);
 	void Shutdown();
 	void Frame();
-	void Render(ID3D11DeviceContext*);
+	void Render(ID3D10Device*);
 
 	int GetIndexCount();
-	ID3D11ShaderResourceView* GetTexture();
+	ID3D10ShaderResourceView* GetTexture();
 
 	float GetWaterHeight();
 	XMFLOAT2 GetNormalMapTiling();
@@ -48,16 +48,16 @@ public:
 	float GetSpecularShininess();
 
 private:
-	bool InitializeBuffers(ID3D11Device*, float);
+	bool InitializeBuffers(ID3D10Device*, float);
 	void ShutdownBuffers();
-	void RenderBuffers(ID3D11DeviceContext*);
+	void RenderBuffers(ID3D10Device*);
 
-	bool LoadTexture(ID3D11Device*, ID3D11DeviceContext*, char*);
+	bool LoadTexture(ID3D10Device*, char*);
 	void ReleaseTexture();
 
 private:
 	float m_waterHeight;
-	ID3D11Buffer *m_vertexBuffer, *m_indexBuffer;
+	ID3D10Buffer *m_vertexBuffer, *m_indexBuffer;
 	int m_vertexCount, m_indexCount;
 	TextureClass* m_Texture;
 	XMFLOAT2 m_normalMapTiling;

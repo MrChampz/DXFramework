@@ -6,9 +6,9 @@
 /////////////////////////////////////////////
 //	INCLUDES
 /////////////////////////////////////////////
-#include <d3d11.h>
 #include <DirectXMath.h>
 #include "DDSTextureLoader.h"
+#include <d3d10.h>
 using namespace DirectX;
 
 /////////////////////////////////////////////
@@ -21,11 +21,11 @@ public:
 	CubeMapClass(const CubeMapClass&);
 	~CubeMapClass();
 
-	bool Initialize(ID3D11Device*, ID3D11DeviceContext*, wchar_t*);
+	bool Initialize(ID3D10Device*, wchar_t*);
 	void Shutdown();
 
-	ID3D11ShaderResourceView* GetCubeMap();
+	ID3D10ShaderResourceView* GetCubeMap();
 
 private:
-	ID3D11ShaderResourceView* m_textureView;
+	ID3D10ShaderResourceView* m_textureView;
 };

@@ -18,8 +18,7 @@ BitmapClass::~BitmapClass()
 {
 }
 
-bool BitmapClass::Initialize(ID3D11Device* device, ID3D11DeviceContext* deviceContext, int screenWidth, int screenHeight,
-	char* textureFilename,	int bitmapWidth, int bitmapHeight)
+bool BitmapClass::Initialize(ID3D10Device* device, int screenWidth, int screenHeight, char* textureFilename,	int bitmapWidth, int bitmapHeight)
 {
 	bool result;
 
@@ -43,7 +42,7 @@ bool BitmapClass::Initialize(ID3D11Device* device, ID3D11DeviceContext* deviceCo
 	}
 
 	// Load the texture for this model
-	result = LoadTexture(device, deviceContext,textureFilename);
+	result = LoadTexture(device,textureFilename);
 	if (!result)
 	{
 		return false;
@@ -63,19 +62,19 @@ void BitmapClass::Shutdown()
 	return;
 }
 
-bool BitmapClass::Render(ID3D11DeviceContext* deviceContext, int positionX, int positionY)
+bool BitmapClass::Render(ID3D10Device* device, int positionX, int positionY)
 {
 	bool result;
 
 	// Re-build the dynamic vertex buffer for rendering to possibly a different location on the screen
-	result = UpdateBuffers(deviceContext, positionX, positionY);
+	result = UpdateBuffers(device, positionX, positionY);
 	if (!result)
 	{
 		return false;
 	}
 
 	// Put the vertex and index buffers on the graphics pipeline to prepare them for drawing
-	RenderBuffers(deviceContext);
+	RenderBuffers(device);
 
 	return true;
 }
@@ -85,17 +84,17 @@ int BitmapClass::GetIndexCount()
 	return m_indexCount;
 }
 
-ID3D11ShaderResourceView* BitmapClass::GetTexture()
+ID3D10ShaderResourceView* BitmapClass::GetTexture()
 {
 	return m_Texture->GetTexture();
 }
 
-bool BitmapClass::InitializeBuffers(ID3D11Device* device)
+bool BitmapClass::InitializeBuffers(ID3D10Device* device)
 {
 	VertexType* vertices;
 	unsigned long* indices;
-	D3D11_BUFFER_DESC vertexBufferDesc, indexBufferDesc;
-	D3D11_SUBRESOURCE_DATA vertexData, indexData;
+	D3D10_BUFFER_DESC vertexBufferDesc, indexBufferDesc;
+	D3D10_SUBRESOURCE_DATA vertexData, indexData;
 	HRESULT result;
 	int i;
 
@@ -129,12 +128,11 @@ bool BitmapClass::InitializeBuffers(ID3D11Device* device)
 	}
 
 	// Set up the description of the dynamic vertex buffer
-	vertexBufferDesc.Usage					= D3D11_USAGE_DYNAMIC;
+	vertexBufferDesc.Usage					= D3D10_USAGE_DYNAMIC;
 	vertexBufferDesc.ByteWidth				= sizeof(VertexType) * m_vertexCount;
-	vertexBufferDesc.BindFlags				= D3D11_BIND_VERTEX_BUFFER;
-	vertexBufferDesc.CPUAccessFlags			= D3D11_CPU_ACCESS_WRITE;
+	vertexBufferDesc.BindFlags				= D3D10_BIND_VERTEX_BUFFER;
+	vertexBufferDesc.CPUAccessFlags			= D3D10_CPU_ACCESS_WRITE;
 	vertexBufferDesc.MiscFlags				= 0;
-	vertexBufferDesc.StructureByteStride	= 0;
 
 	// Give the subresource structure a pointer to the vertex data
 	vertexData.pSysMem			= vertices;
@@ -149,12 +147,11 @@ bool BitmapClass::InitializeBuffers(ID3D11Device* device)
 	}
 
 	// Set up the description of the static index buffer.
-	indexBufferDesc.Usage = D3D11_USAGE_DEFAULT;
+	indexBufferDesc.Usage = D3D10_USAGE_DEFAULT;
 	indexBufferDesc.ByteWidth = sizeof(unsigned long) * m_indexCount;
-	indexBufferDesc.BindFlags = D3D11_BIND_INDEX_BUFFER;
+	indexBufferDesc.BindFlags = D3D10_BIND_INDEX_BUFFER;
 	indexBufferDesc.CPUAccessFlags = 0;
 	indexBufferDesc.MiscFlags = 0;
-	indexBufferDesc.StructureByteStride = 0;
 
 	// Give the subresource structure a pointer to the index data.
 	indexData.pSysMem = indices;
@@ -197,11 +194,11 @@ void BitmapClass::ShutdownBuffers()
 	return;
 }
 
-bool BitmapClass::UpdateBuffers(ID3D11DeviceContext* deviceContext, int positionX, int positionY)
+bool BitmapClass::UpdateBuffers(ID3D10Device* device, int positionX, int positionY)
 {
 	float left, right, top, bottom;
 	VertexType* vertices;
-	D3D11_MAPPED_SUBRESOURCE mappedResource;
+	void* mappedResource;
 	VertexType* verticesPtr;
 	HRESULT result;
 
@@ -257,20 +254,20 @@ bool BitmapClass::UpdateBuffers(ID3D11DeviceContext* deviceContext, int position
 	vertices[5].texture = XMFLOAT2(1.0f, 1.0f);
 
 	// Lock the vertex buffer so it can be written to.
-	result = deviceContext->Map(m_vertexBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
+	result = m_vertexBuffer->Map(D3D10_MAP_WRITE_DISCARD, 0, &mappedResource);
 	if (FAILED(result))
 	{
 		return false;
 	}
 
 	// Get a pointer to the data in the vertex buffer.
-	verticesPtr = (VertexType*)mappedResource.pData;
+	verticesPtr = (VertexType*)mappedResource;
 
 	// Copy the data into the vertex buffer.
 	memcpy(verticesPtr, (void*)vertices, (sizeof(VertexType) * m_vertexCount));
 
 	// Unlock the vertex buffer.
-	deviceContext->Unmap(m_vertexBuffer, 0);
+	m_vertexBuffer->Unmap();
 
 	// Release the vertex array as it is no longer needed.
 	delete[] vertices;
@@ -279,7 +276,7 @@ bool BitmapClass::UpdateBuffers(ID3D11DeviceContext* deviceContext, int position
 	return true;
 }
 
-void BitmapClass::RenderBuffers(ID3D11DeviceContext* deviceContext)
+void BitmapClass::RenderBuffers(ID3D10Device* device)
 {
 	unsigned int stride;
 	unsigned int offset;
@@ -289,18 +286,18 @@ void BitmapClass::RenderBuffers(ID3D11DeviceContext* deviceContext)
 	offset = 0;
 
 	// Set the vertex buffer to active in the input assembler so it can be rendered.
-	deviceContext->IASetVertexBuffers(0, 1, &m_vertexBuffer, &stride, &offset);
+	device->IASetVertexBuffers(0, 1, &m_vertexBuffer, &stride, &offset);
 
 	// Set the index buffer to active in the input assembler so it can be rendered.
-	deviceContext->IASetIndexBuffer(m_indexBuffer, DXGI_FORMAT_R32_UINT, 0);
+	device->IASetIndexBuffer(m_indexBuffer, DXGI_FORMAT_R32_UINT, 0);
 
 	// Set the type of primitive that should be rendered from this vertex buffer, in this case triangles.
-	deviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+	device->IASetPrimitiveTopology(D3D10_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
 	return;
 }
 
-bool BitmapClass::LoadTexture(ID3D11Device* device, ID3D11DeviceContext* deviceContext, char* filename)
+bool BitmapClass::LoadTexture(ID3D10Device* device, char* filename)
 {
 	bool result;
 
@@ -312,7 +309,7 @@ bool BitmapClass::LoadTexture(ID3D11Device* device, ID3D11DeviceContext* deviceC
 	}
 
 	// Initialize the texture object.
-	result = m_Texture->Initialize(device, deviceContext, filename);
+	result = m_Texture->Initialize(device, filename);
 	if (!result)
 	{
 		return false;

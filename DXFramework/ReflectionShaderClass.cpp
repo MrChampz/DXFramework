@@ -22,7 +22,7 @@ ReflectionShaderClass::~ReflectionShaderClass()
 {
 }
 
-bool ReflectionShaderClass::Initialize(ID3D11Device* device, HWND hwnd)
+bool ReflectionShaderClass::Initialize(ID3D10Device* device, HWND hwnd)
 {
 	bool result;
 
@@ -44,14 +44,14 @@ void ReflectionShaderClass::Shutdown()
 	return;
 }
 
-bool ReflectionShaderClass::Render(ID3D11DeviceContext* deviceContext, int indexCount, XMMATRIX worldMatrix, XMMATRIX viewMatrix,
-	XMMATRIX projectionMatrix, ID3D11ShaderResourceView* texture, ID3D11ShaderResourceView* normalMap,
+bool ReflectionShaderClass::Render(ID3D10Device* device, int indexCount, XMMATRIX worldMatrix, XMMATRIX viewMatrix,
+	XMMATRIX projectionMatrix, ID3D10ShaderResourceView* texture, ID3D10ShaderResourceView* normalMap,
 	XMFLOAT4 lightDiffuseColor, XMFLOAT3 lightDirection, float colorTextureBrightness, XMFLOAT4 clipPlane)
 {
 	bool result;
 
 	// Set the shader parameters that it will use for rendering
-	result = SetShaderParameters(deviceContext, worldMatrix, viewMatrix, projectionMatrix, texture, normalMap,
+	result = SetShaderParameters(device, worldMatrix, viewMatrix, projectionMatrix, texture, normalMap,
 		lightDiffuseColor, lightDirection, colorTextureBrightness, clipPlane);
 	if (!result)
 	{
@@ -59,23 +59,23 @@ bool ReflectionShaderClass::Render(ID3D11DeviceContext* deviceContext, int index
 	}
 
 	// Now render the prepared buffers with the shader
-	RenderShader(deviceContext, indexCount);
+	RenderShader(device, indexCount);
 
 	return true;
 }
 
-bool ReflectionShaderClass::InitializeShader(ID3D11Device* device, HWND hwnd, WCHAR* vsFilename, WCHAR* psFilename)
+bool ReflectionShaderClass::InitializeShader(ID3D10Device* device, HWND hwnd, WCHAR* vsFilename, WCHAR* psFilename)
 {
 	HRESULT result;
 	ID3D10Blob* errorMessage;
 	ID3D10Blob* vertexShaderBuffer;
 	ID3D10Blob* pixelShaderBuffer;
-	D3D11_INPUT_ELEMENT_DESC polygonLayout[6];
+	D3D10_INPUT_ELEMENT_DESC polygonLayout[6];
 	unsigned int numElements;
-	D3D11_BUFFER_DESC matrixBufferDesc;
-	D3D11_BUFFER_DESC clipPlaneBufferDesc;
-	D3D11_BUFFER_DESC lightBufferDesc;
-	D3D11_SAMPLER_DESC samplerDesc;
+	D3D10_BUFFER_DESC matrixBufferDesc;
+	D3D10_BUFFER_DESC clipPlaneBufferDesc;
+	D3D10_BUFFER_DESC lightBufferDesc;
+	D3D10_SAMPLER_DESC samplerDesc;
 
 	// Initialize the pointers this function will use to null
 	errorMessage = 0;
@@ -121,14 +121,14 @@ bool ReflectionShaderClass::InitializeShader(ID3D11Device* device, HWND hwnd, WC
 	}
 
 	// Create the vertex shader from the buffer
-	result = device->CreateVertexShader(vertexShaderBuffer->GetBufferPointer(), vertexShaderBuffer->GetBufferSize(), NULL, &m_vertexShader);
+	result = device->CreateVertexShader(vertexShaderBuffer->GetBufferPointer(), vertexShaderBuffer->GetBufferSize(), &m_vertexShader);
 	if (FAILED(result))
 	{
 		return false;
 	}
 
 	// Create the pixel shader from the buffer
-	result = device->CreatePixelShader(pixelShaderBuffer->GetBufferPointer(), pixelShaderBuffer->GetBufferSize(), NULL, &m_pixelShader);
+	result = device->CreatePixelShader(pixelShaderBuffer->GetBufferPointer(), pixelShaderBuffer->GetBufferSize(), &m_pixelShader);
 	if (FAILED(result))
 	{
 		return false;
@@ -140,47 +140,47 @@ bool ReflectionShaderClass::InitializeShader(ID3D11Device* device, HWND hwnd, WC
 	polygonLayout[0].Format = DXGI_FORMAT_R32G32B32_FLOAT;
 	polygonLayout[0].InputSlot = 0;
 	polygonLayout[0].AlignedByteOffset = 0;
-	polygonLayout[0].InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
+	polygonLayout[0].InputSlotClass = D3D10_INPUT_PER_VERTEX_DATA;
 	polygonLayout[0].InstanceDataStepRate = 0;
 
 	polygonLayout[1].SemanticName = "TEXCOORD";
 	polygonLayout[1].SemanticIndex = 0;
 	polygonLayout[1].Format = DXGI_FORMAT_R32G32_FLOAT;
 	polygonLayout[1].InputSlot = 0;
-	polygonLayout[1].AlignedByteOffset = D3D11_APPEND_ALIGNED_ELEMENT;
-	polygonLayout[1].InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
+	polygonLayout[1].AlignedByteOffset = D3D10_APPEND_ALIGNED_ELEMENT;
+	polygonLayout[1].InputSlotClass = D3D10_INPUT_PER_VERTEX_DATA;
 	polygonLayout[1].InstanceDataStepRate = 0;
 
 	polygonLayout[2].SemanticName = "NORMAL";
 	polygonLayout[2].SemanticIndex = 0;
 	polygonLayout[2].Format = DXGI_FORMAT_R32G32B32_FLOAT;
 	polygonLayout[2].InputSlot = 0;
-	polygonLayout[2].AlignedByteOffset = D3D11_APPEND_ALIGNED_ELEMENT;
-	polygonLayout[2].InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
+	polygonLayout[2].AlignedByteOffset = D3D10_APPEND_ALIGNED_ELEMENT;
+	polygonLayout[2].InputSlotClass = D3D10_INPUT_PER_VERTEX_DATA;
 	polygonLayout[2].InstanceDataStepRate = 0;
 
 	polygonLayout[3].SemanticName = "TANGENT";
 	polygonLayout[3].SemanticIndex = 0;
 	polygonLayout[3].Format = DXGI_FORMAT_R32G32B32_FLOAT;
 	polygonLayout[3].InputSlot = 0;
-	polygonLayout[3].AlignedByteOffset = D3D11_APPEND_ALIGNED_ELEMENT;
-	polygonLayout[3].InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
+	polygonLayout[3].AlignedByteOffset = D3D10_APPEND_ALIGNED_ELEMENT;
+	polygonLayout[3].InputSlotClass = D3D10_INPUT_PER_VERTEX_DATA;
 	polygonLayout[3].InstanceDataStepRate = 0;
 
 	polygonLayout[4].SemanticName = "BINORMAL";
 	polygonLayout[4].SemanticIndex = 0;
 	polygonLayout[4].Format = DXGI_FORMAT_R32G32B32_FLOAT;
 	polygonLayout[4].InputSlot = 0;
-	polygonLayout[4].AlignedByteOffset = D3D11_APPEND_ALIGNED_ELEMENT;
-	polygonLayout[4].InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
+	polygonLayout[4].AlignedByteOffset = D3D10_APPEND_ALIGNED_ELEMENT;
+	polygonLayout[4].InputSlotClass = D3D10_INPUT_PER_VERTEX_DATA;
 	polygonLayout[4].InstanceDataStepRate = 0;
 
 	polygonLayout[5].SemanticName = "COLOR";
 	polygonLayout[5].SemanticIndex = 0;
 	polygonLayout[5].Format = DXGI_FORMAT_R32G32B32_FLOAT;
 	polygonLayout[5].InputSlot = 0;
-	polygonLayout[5].AlignedByteOffset = D3D11_APPEND_ALIGNED_ELEMENT;
-	polygonLayout[5].InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
+	polygonLayout[5].AlignedByteOffset = D3D10_APPEND_ALIGNED_ELEMENT;
+	polygonLayout[5].InputSlotClass = D3D10_INPUT_PER_VERTEX_DATA;
 	polygonLayout[5].InstanceDataStepRate = 0;
 
 	//  Get a count of the elements in the layout
@@ -202,12 +202,11 @@ bool ReflectionShaderClass::InitializeShader(ID3D11Device* device, HWND hwnd, WC
 	pixelShaderBuffer = 0;
 
 	// Setup the description of the matrix dynamic constant buffer that is in the vertex shader
-	matrixBufferDesc.Usage = D3D11_USAGE_DYNAMIC;
+	matrixBufferDesc.Usage = D3D10_USAGE_DYNAMIC;
 	matrixBufferDesc.ByteWidth = sizeof(MatrixBufferType);
-	matrixBufferDesc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
-	matrixBufferDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
+	matrixBufferDesc.BindFlags = D3D10_BIND_CONSTANT_BUFFER;
+	matrixBufferDesc.CPUAccessFlags = D3D10_CPU_ACCESS_WRITE;
 	matrixBufferDesc.MiscFlags = 0;
-	matrixBufferDesc.StructureByteStride = 0;
 
 	// Create the constant buffer pointer so we can acess the vertex shader constant buffer from within this class
 	result = device->CreateBuffer(&matrixBufferDesc, NULL, &m_matrixBuffer);
@@ -217,12 +216,11 @@ bool ReflectionShaderClass::InitializeShader(ID3D11Device* device, HWND hwnd, WC
 	}
 
 	// Setup the description of the clip plane dynamic constant buffer that is in the vertex shader
-	clipPlaneBufferDesc.Usage = D3D11_USAGE_DYNAMIC;
+	clipPlaneBufferDesc.Usage = D3D10_USAGE_DYNAMIC;
 	clipPlaneBufferDesc.ByteWidth = sizeof(ClipPlaneBufferType);
-	clipPlaneBufferDesc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
-	clipPlaneBufferDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
+	clipPlaneBufferDesc.BindFlags = D3D10_BIND_CONSTANT_BUFFER;
+	clipPlaneBufferDesc.CPUAccessFlags = D3D10_CPU_ACCESS_WRITE;
 	clipPlaneBufferDesc.MiscFlags = 0;
-	clipPlaneBufferDesc.StructureByteStride = 0;
 
 	// Create the constant buffer pointer so we can acess the vertex shader constant buffer from within this class
 	result = device->CreateBuffer(&clipPlaneBufferDesc, NULL, &m_clipPlaneBuffer);
@@ -232,12 +230,11 @@ bool ReflectionShaderClass::InitializeShader(ID3D11Device* device, HWND hwnd, WC
 	}
 
 	// Setup the description of the dynamic light constant buffer that is in the pixel shader
-	lightBufferDesc.Usage = D3D11_USAGE_DYNAMIC;
+	lightBufferDesc.Usage = D3D10_USAGE_DYNAMIC;
 	lightBufferDesc.ByteWidth = sizeof(LightBufferType);
-	lightBufferDesc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
-	lightBufferDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
+	lightBufferDesc.BindFlags = D3D10_BIND_CONSTANT_BUFFER;
+	lightBufferDesc.CPUAccessFlags = D3D10_CPU_ACCESS_WRITE;
 	lightBufferDesc.MiscFlags = 0;
-	lightBufferDesc.StructureByteStride = 0;
 
 	// Create the constant buffer pointer so we can acess the pixel shader constant buffer from within this class
 	result = device->CreateBuffer(&lightBufferDesc, NULL, &m_lightBuffer);
@@ -247,19 +244,19 @@ bool ReflectionShaderClass::InitializeShader(ID3D11Device* device, HWND hwnd, WC
 	}
 
 	// Create a texture sampler state description
-	samplerDesc.Filter = D3D11_FILTER_MIN_MAG_MIP_LINEAR;
-	samplerDesc.AddressU = D3D11_TEXTURE_ADDRESS_CLAMP;
-	samplerDesc.AddressV = D3D11_TEXTURE_ADDRESS_CLAMP;
-	samplerDesc.AddressW = D3D11_TEXTURE_ADDRESS_CLAMP;
+	samplerDesc.Filter = D3D10_FILTER_MIN_MAG_MIP_LINEAR;
+	samplerDesc.AddressU = D3D10_TEXTURE_ADDRESS_CLAMP;
+	samplerDesc.AddressV = D3D10_TEXTURE_ADDRESS_CLAMP;
+	samplerDesc.AddressW = D3D10_TEXTURE_ADDRESS_CLAMP;
 	samplerDesc.MipLODBias = 0.0f;
 	samplerDesc.MaxAnisotropy = 1;
-	samplerDesc.ComparisonFunc = D3D11_COMPARISON_ALWAYS;
+	samplerDesc.ComparisonFunc = D3D10_COMPARISON_ALWAYS;
 	samplerDesc.BorderColor[0] = 0;
 	samplerDesc.BorderColor[1] = 0;
 	samplerDesc.BorderColor[2] = 0;
 	samplerDesc.BorderColor[3] = 0;
 	samplerDesc.MinLOD = 0;
-	samplerDesc.MaxLOD = D3D11_FLOAT32_MAX;
+	samplerDesc.MaxLOD = D3D10_FLOAT32_MAX;
 
 	// Create the texture sampler state
 	result = device->CreateSamplerState(&samplerDesc, &m_sampleState);
@@ -359,12 +356,12 @@ void ReflectionShaderClass::OutputShaderErrorMessage(ID3D10Blob* errorMessage, H
 	return;
 }
 
-bool ReflectionShaderClass::SetShaderParameters(ID3D11DeviceContext* deviceContext, XMMATRIX worldMatrix, XMMATRIX viewMatrix,
-	XMMATRIX projectionMatrix, ID3D11ShaderResourceView* texture, ID3D11ShaderResourceView* normalMap,
+bool ReflectionShaderClass::SetShaderParameters(ID3D10Device* device, XMMATRIX worldMatrix, XMMATRIX viewMatrix,
+	XMMATRIX projectionMatrix, ID3D10ShaderResourceView* texture, ID3D10ShaderResourceView* normalMap,
 	XMFLOAT4 lightDiffuseColor, XMFLOAT3 lightDirection, float colorTextureBrightness, XMFLOAT4 clipPlane)
 {
 	HRESULT result;
-	D3D11_MAPPED_SUBRESOURCE mappedResource;
+	void* mappedResource;
 	unsigned int bufferNumber;
 	MatrixBufferType* dataPtr;
 	ClipPlaneBufferType* dataPtr1;
@@ -376,14 +373,14 @@ bool ReflectionShaderClass::SetShaderParameters(ID3D11DeviceContext* deviceConte
 	projectionMatrix = XMMatrixTranspose(projectionMatrix);
 
 	// Lock the constant buffer so it can be written to
-	result = deviceContext->Map(m_matrixBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
+	result = m_matrixBuffer->Map(D3D10_MAP_WRITE_DISCARD, 0, &mappedResource);
 	if (FAILED(result))
 	{
 		return false;
 	}
 
 	// Get a pointer to the data in the constant buffer
-	dataPtr = (MatrixBufferType*)mappedResource.pData;
+	dataPtr = (MatrixBufferType*)mappedResource;
 
 	// Copy the matrices into the constant buffer
 	dataPtr->world = worldMatrix;
@@ -391,45 +388,45 @@ bool ReflectionShaderClass::SetShaderParameters(ID3D11DeviceContext* deviceConte
 	dataPtr->projection = projectionMatrix;
 
 	// Unlock the constant buffer
-	deviceContext->Unmap(m_matrixBuffer, 0);
+	m_matrixBuffer->Unmap();
 
 	// Set the position of the constant buffer in the vertex shader
 	bufferNumber = 0;
 
 	// Finanly set the constant buffer in the vertex shader with the updated values
-	deviceContext->VSSetConstantBuffers(bufferNumber, 1, &m_matrixBuffer);
+	device->VSSetConstantBuffers(bufferNumber, 1, &m_matrixBuffer);
 
 	// Lock the constant buffer so it can be written to
-	result = deviceContext->Map(m_clipPlaneBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
+	result = m_clipPlaneBuffer->Map(D3D10_MAP_WRITE_DISCARD, 0, &mappedResource);
 	if (FAILED(result))
 	{
 		return false;
 	}
 
 	// Get a pointer to the data in the constant buffer
-	dataPtr1 = (ClipPlaneBufferType*)mappedResource.pData;
+	dataPtr1 = (ClipPlaneBufferType*)mappedResource;
 
 	// Copy the matrices into the constant buffer
 	dataPtr1->clipPlane = clipPlane;
 
 	// Unlock the constant buffer
-	deviceContext->Unmap(m_clipPlaneBuffer, 0);
+	m_clipPlaneBuffer->Unmap();
 
 	// Set the position of the constant buffer in the vertex shader
 	bufferNumber = 1;
 
 	// Finanly set the constant buffer in the vertex shader with the updated values
-	deviceContext->VSSetConstantBuffers(bufferNumber, 1, &m_clipPlaneBuffer);
+	device->VSSetConstantBuffers(bufferNumber, 1, &m_clipPlaneBuffer);
 
 	// Lock the light constant buffer so it can be written to
-	result = deviceContext->Map(m_lightBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
+	result = m_lightBuffer->Map(D3D10_MAP_WRITE_DISCARD, 0, &mappedResource);
 	if (FAILED(result))
 	{
 		return false;
 	}
 
 	// Get a pointer to the data in the constant buffer
-	dataPtr2 = (LightBufferType*)mappedResource.pData;
+	dataPtr2 = (LightBufferType*)mappedResource;
 
 	// Copy the lighting variables into the constant buffer
 	dataPtr2->diffuseColor = lightDiffuseColor;
@@ -437,35 +434,35 @@ bool ReflectionShaderClass::SetShaderParameters(ID3D11DeviceContext* deviceConte
 	dataPtr2->colorTextureBrightness = colorTextureBrightness;
 
 	// Unlock the constant buffer
-	deviceContext->Unmap(m_lightBuffer, 0);
+	m_lightBuffer->Unmap();
 
 	// Set the position of the light constant buffer in the pixel shader.
 	bufferNumber = 0;
 
 	// Finally set the light constant buffer in the pixel shader with the updated values.
-	deviceContext->PSSetConstantBuffers(bufferNumber, 1, &m_lightBuffer);
+	device->PSSetConstantBuffers(bufferNumber, 1, &m_lightBuffer);
 
 	// Set shader texture resources in the pixel shader
-	deviceContext->PSSetShaderResources(0, 1, &texture);
-	deviceContext->PSSetShaderResources(1, 1, &normalMap);
+	device->PSSetShaderResources(0, 1, &texture);
+	device->PSSetShaderResources(1, 1, &normalMap);
 
 	return true;
 }
 
-void ReflectionShaderClass::RenderShader(ID3D11DeviceContext* deviceContext, int indexCount)
+void ReflectionShaderClass::RenderShader(ID3D10Device* device, int indexCount)
 {
 	// Set the vertex input layout
-	deviceContext->IASetInputLayout(m_layout);
+	device->IASetInputLayout(m_layout);
 
 	// Set the vertex and pixel shaders that will be used to render this triangle
-	deviceContext->VSSetShader(m_vertexShader, NULL, 0);
-	deviceContext->PSSetShader(m_pixelShader, NULL, 0);
+	device->VSSetShader(m_vertexShader);
+	device->PSSetShader(m_pixelShader);
 
 	// Set the sampler state in the pixel shader
-	deviceContext->PSSetSamplers(0, 1, &m_sampleState);
+	device->PSSetSamplers(0, 1, &m_sampleState);
 
 	// Render the triangle
-	deviceContext->DrawIndexed(indexCount, 0, 0);
+	device->DrawIndexed(indexCount, 0, 0);
 
 	return;
 }

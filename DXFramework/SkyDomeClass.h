@@ -6,8 +6,8 @@
 /////////////////////////////////////////////
 //	INCLUDES
 /////////////////////////////////////////////
-#include <d3d11.h>
 #include <DirectXMath.h>
+#include <d3d10.h>
 #include <fstream>
 using namespace DirectX;
 using namespace std;
@@ -40,11 +40,11 @@ public:
 	SkyDomeClass(const SkyDomeClass&);
 	~SkyDomeClass();
 
-	bool Initialize(ID3D11Device*, ID3D11DeviceContext*);
+	bool Initialize(ID3D10Device*);
 	void Shutdown();
-	void Render(ID3D11DeviceContext*);
+	void Render(ID3D10Device*);
 
-	ID3D11ShaderResourceView* GetCubeMap();
+	ID3D10ShaderResourceView* GetCubeMap();
 	int GetIndexCount();
 	XMFLOAT4 GetApexColor();
 	XMFLOAT4 GetCenterColor();
@@ -53,18 +53,18 @@ private:
 	bool LoadSkyDomeModel(char*);
 	void ReleaseSkyDomeModel();
 
-	bool LoadCubeMap(ID3D11Device*, ID3D11DeviceContext*, wchar_t*);
+	bool LoadCubeMap(ID3D10Device*, wchar_t*);
 	void ReleaseCubeMap();
 
-	bool InitializeBuffers(ID3D11Device*);
+	bool InitializeBuffers(ID3D10Device*);
 	void ReleaseBuffers();
-	void RenderBuffers(ID3D11DeviceContext*);
+	void RenderBuffers(ID3D10Device*);
 
 private:
 	CubeMapClass* m_CubeMap;
 	ModelType* m_model;
 	int m_vertexCount, m_indexCount;
-	ID3D11Buffer *m_vertexBuffer, * m_indexBuffer;
+	ID3D10Buffer *m_vertexBuffer, * m_indexBuffer;
 	XMFLOAT4 m_apexColor, m_centerColor;
 };
 

@@ -17,8 +17,7 @@ FontClass::~FontClass()
 {
 }
 
-bool FontClass::Initialize(ID3D11Device* device, ID3D11DeviceContext* deviceContext,
-	char* fontFilename, char* textureFilename, float fontHeight, int spaceSize)
+bool FontClass::Initialize(ID3D10Device* device, char* fontFilename, char* textureFilename, float fontHeight, int spaceSize)
 {
 	bool result;
 
@@ -36,7 +35,7 @@ bool FontClass::Initialize(ID3D11Device* device, ID3D11DeviceContext* deviceCont
 	}
 
 	// Load the texture that has the font characters on it
-	result = LoadTexture(device, deviceContext, textureFilename);
+	result = LoadTexture(device, textureFilename);
 	if (!result)
 	{
 		return false;
@@ -113,7 +112,7 @@ void FontClass::ReleaseFontData()
 	return;
 }
 
-bool FontClass::LoadTexture(ID3D11Device* device, ID3D11DeviceContext* deviceContext, char* filename)
+bool FontClass::LoadTexture(ID3D10Device* device, char* filename)
 {
 	bool result;
 
@@ -125,7 +124,7 @@ bool FontClass::LoadTexture(ID3D11Device* device, ID3D11DeviceContext* deviceCon
 	}
 
 	// Initialize the texture object
-	result = m_Texture->Initialize(device, deviceContext, filename);
+	result = m_Texture->Initialize(device, filename);
 	if (!result)
 	{
 		return false;
@@ -147,7 +146,7 @@ void FontClass::ReleaseTexture()
 	return;
 }
 
-ID3D11ShaderResourceView* FontClass::GetTexture()
+ID3D10ShaderResourceView* FontClass::GetTexture()
 {
 	return m_Texture->GetTexture();
 }
@@ -213,7 +212,6 @@ void FontClass::BuildVertexArray(void* vertices, char* sentence, float drawX, fl
 	return;
 }
 
-
 int FontClass::GetSentencePixelLength(char* sentence)
 {
 	int pixelLength, numLetters, i, letter;
@@ -239,7 +237,6 @@ int FontClass::GetSentencePixelLength(char* sentence)
 
 	return pixelLength;
 }
-
 
 int FontClass::GetFontHeight()
 {

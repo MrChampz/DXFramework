@@ -6,8 +6,8 @@
 /////////////////////////////////////////////
 //	INCLUDES
 /////////////////////////////////////////////
-#include <d3d11.h>
 #include <DirectXMath.h>
+#include <d3d10.h>
 using namespace DirectX;
 
 /////////////////////////////////////////////
@@ -52,10 +52,10 @@ public:
 	TerrainCellClass(const TerrainCellClass&);
 	~TerrainCellClass();
 
-	bool Initialize(ID3D11Device*, void*, int, int, int, int, int);
+	bool Initialize(ID3D10Device*, void*, int, int, int, int, int);
 	void Shutdown();
-	void Render(ID3D11DeviceContext*);
-	void RenderLineBuffers(ID3D11DeviceContext*);
+	void Render(ID3D10Device*);
+	void RenderLineBuffers(ID3D10Device*);
 
 	int GetVertexCount();
 	int GetIndexCount();
@@ -63,11 +63,11 @@ public:
 	void GetCellDimensions(float&, float&, float&, float&, float&, float&);
 
 private:
-	bool InitializeBuffers(ID3D11Device*, int, int, int, int, int, ModelType*);
+	bool InitializeBuffers(ID3D10Device*, int, int, int, int, int, ModelType*);
 	void ShutdownBuffers();
-	void RenderBuffers(ID3D11DeviceContext*);
+	void RenderBuffers(ID3D10Device*);
 	void CalculateCellDimensions();
-	bool BuildLineBuffers(ID3D11Device*);
+	bool BuildLineBuffers(ID3D10Device*);
 	void ShutdownLineBuffers();
 
 public:
@@ -75,7 +75,7 @@ public:
 
 private:
 	int m_vertexCount, m_indexCount, m_lineIndexCount;
-	ID3D11Buffer *m_vertexBuffer, *m_indexBuffer, *m_lineVertexBuffer, *m_lineIndexBuffer;
+	ID3D10Buffer *m_vertexBuffer, *m_indexBuffer, *m_lineVertexBuffer, *m_lineIndexBuffer;
 	float m_maxWidth, m_maxHeight, m_maxDepth, m_minWidth, m_minHeight, m_minDepth;
 	float m_positionX, m_positionY, m_positionZ;
 };

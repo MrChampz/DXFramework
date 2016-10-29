@@ -20,7 +20,7 @@ SkyDomeShaderClass::~SkyDomeShaderClass()
 {
 }
 
-bool SkyDomeShaderClass::Initialize(ID3D11Device* device, HWND hwnd)
+bool SkyDomeShaderClass::Initialize(ID3D10Device* device, HWND hwnd)
 {
 	bool result;
 
@@ -42,34 +42,34 @@ void SkyDomeShaderClass::Shutdown()
 	return;
 }
 
-bool SkyDomeShaderClass::Render(ID3D11DeviceContext* deviceContext, int indexCount,
-	XMMATRIX worldMatrix, XMMATRIX viewMatrix, XMMATRIX projectionMatrix, ID3D11ShaderResourceView* cubeMap)
+bool SkyDomeShaderClass::Render(ID3D10Device* device, int indexCount,
+	XMMATRIX worldMatrix, XMMATRIX viewMatrix, XMMATRIX projectionMatrix, ID3D10ShaderResourceView* cubeMap)
 {
 	bool result;
 
 	// Set the shader parameters that it will use for rendering
-	result = SetShaderParameters(deviceContext, worldMatrix, viewMatrix, projectionMatrix, cubeMap);
+	result = SetShaderParameters(device, worldMatrix, viewMatrix, projectionMatrix, cubeMap);
 	if (!result)
 	{
 		return false;
 	}
 
 	// Now render the prepared buffers with the shader
-	RenderShader(deviceContext, indexCount);
+	RenderShader(device, indexCount);
 
 	return true;
 }
 
-bool SkyDomeShaderClass::InitializeShader(ID3D11Device* device, HWND hwnd, WCHAR* vsFilename, WCHAR* psFilename)
+bool SkyDomeShaderClass::InitializeShader(ID3D10Device* device, HWND hwnd, WCHAR* vsFilename, WCHAR* psFilename)
 {
 	HRESULT result;
 	ID3D10Blob* errorMessage;
 	ID3D10Blob* vertexShaderBuffer;
 	ID3D10Blob* pixelShaderBuffer;
-	D3D11_INPUT_ELEMENT_DESC polygonLayout[1];
+	D3D10_INPUT_ELEMENT_DESC polygonLayout[1];
 	unsigned int numElements;
-	D3D11_SAMPLER_DESC samplerDesc;
-	D3D11_BUFFER_DESC matrixBufferDesc;
+	D3D10_SAMPLER_DESC samplerDesc;
+	D3D10_BUFFER_DESC matrixBufferDesc;
 
 	// Initialize the pointers this function will use to null
 	errorMessage = 0;
@@ -115,14 +115,14 @@ bool SkyDomeShaderClass::InitializeShader(ID3D11Device* device, HWND hwnd, WCHAR
 	}
 
 	// Create the vertex shader from the buffer
-	result = device->CreateVertexShader(vertexShaderBuffer->GetBufferPointer(), vertexShaderBuffer->GetBufferSize(), NULL, &m_vertexShader);
+	result = device->CreateVertexShader(vertexShaderBuffer->GetBufferPointer(), vertexShaderBuffer->GetBufferSize(), &m_vertexShader);
 	if (FAILED(result))
 	{
 		return false;
 	}
 
 	// Create the pixel shader from the buffer
-	result = device->CreatePixelShader(pixelShaderBuffer->GetBufferPointer(), pixelShaderBuffer->GetBufferSize(), NULL, &m_pixelShader);
+	result = device->CreatePixelShader(pixelShaderBuffer->GetBufferPointer(), pixelShaderBuffer->GetBufferSize(), &m_pixelShader);
 	if (FAILED(result))
 	{
 		return false;
@@ -134,7 +134,7 @@ bool SkyDomeShaderClass::InitializeShader(ID3D11Device* device, HWND hwnd, WCHAR
 	polygonLayout[0].Format = DXGI_FORMAT_R32G32B32_FLOAT;
 	polygonLayout[0].InputSlot = 0;
 	polygonLayout[0].AlignedByteOffset = 0;
-	polygonLayout[0].InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
+	polygonLayout[0].InputSlotClass = D3D10_INPUT_PER_VERTEX_DATA;
 	polygonLayout[0].InstanceDataStepRate = 0;
 
 	//  Get a count of the elements in the layout
@@ -156,19 +156,19 @@ bool SkyDomeShaderClass::InitializeShader(ID3D11Device* device, HWND hwnd, WCHAR
 	pixelShaderBuffer = 0;
 
 	// Create a cubemap sampler state description
-	samplerDesc.Filter = D3D11_FILTER_MIN_MAG_MIP_LINEAR;
-	samplerDesc.AddressU = D3D11_TEXTURE_ADDRESS_WRAP;
-	samplerDesc.AddressV = D3D11_TEXTURE_ADDRESS_WRAP;
-	samplerDesc.AddressW = D3D11_TEXTURE_ADDRESS_WRAP;
+	samplerDesc.Filter = D3D10_FILTER_MIN_MAG_MIP_LINEAR;
+	samplerDesc.AddressU = D3D10_TEXTURE_ADDRESS_WRAP;
+	samplerDesc.AddressV = D3D10_TEXTURE_ADDRESS_WRAP;
+	samplerDesc.AddressW = D3D10_TEXTURE_ADDRESS_WRAP;
 	samplerDesc.MipLODBias = 0.0f;
 	samplerDesc.MaxAnisotropy = 1;
-	samplerDesc.ComparisonFunc = D3D11_COMPARISON_ALWAYS;
+	samplerDesc.ComparisonFunc = D3D10_COMPARISON_ALWAYS;
 	samplerDesc.BorderColor[0] = 0;
 	samplerDesc.BorderColor[1] = 0;
 	samplerDesc.BorderColor[2] = 0;
 	samplerDesc.BorderColor[3] = 0;
 	samplerDesc.MinLOD = 0;
-	samplerDesc.MaxLOD = D3D11_FLOAT32_MAX;
+	samplerDesc.MaxLOD = D3D10_FLOAT32_MAX;
 
 	// Create the cubemap sampler state
 	result = device->CreateSamplerState(&samplerDesc, &m_sampleState);
@@ -178,12 +178,11 @@ bool SkyDomeShaderClass::InitializeShader(ID3D11Device* device, HWND hwnd, WCHAR
 	}
 
 	// Setup the description of the dynamic matrix constant buffer that is in the vertex shader
-	matrixBufferDesc.Usage = D3D11_USAGE_DYNAMIC;
+	matrixBufferDesc.Usage = D3D10_USAGE_DYNAMIC;
 	matrixBufferDesc.ByteWidth = sizeof(MatrixBufferType);
-	matrixBufferDesc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
-	matrixBufferDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
+	matrixBufferDesc.BindFlags = D3D10_BIND_CONSTANT_BUFFER;
+	matrixBufferDesc.CPUAccessFlags = D3D10_CPU_ACCESS_WRITE;
 	matrixBufferDesc.MiscFlags = 0;
-	matrixBufferDesc.StructureByteStride = 0;
 
 	// Create the constant buffer pointer so we can acess the vertex shader constant buffer from within this class
 	result = device->CreateBuffer(&matrixBufferDesc, NULL, &m_matrixBuffer);
@@ -269,11 +268,11 @@ void SkyDomeShaderClass::OutputShaderErrorMessage(ID3D10Blob* errorMessage, HWND
 	return;
 }
 
-bool SkyDomeShaderClass::SetShaderParameters(ID3D11DeviceContext* deviceContext,
-	XMMATRIX worldMatrix, XMMATRIX viewMatrix, XMMATRIX projectionMatrix, ID3D11ShaderResourceView* cubeMap)
+bool SkyDomeShaderClass::SetShaderParameters(ID3D10Device* device,
+	XMMATRIX worldMatrix, XMMATRIX viewMatrix, XMMATRIX projectionMatrix, ID3D10ShaderResourceView* cubeMap)
 {
 	HRESULT result;
-	D3D11_MAPPED_SUBRESOURCE mappedResource;
+	void* mappedResource;
 	MatrixBufferType* dataPtr;
 	unsigned int bufferNumber;
 
@@ -283,14 +282,14 @@ bool SkyDomeShaderClass::SetShaderParameters(ID3D11DeviceContext* deviceContext,
 	projectionMatrix = XMMatrixTranspose(projectionMatrix);
 
 	// Lock the constant buffer so it can be written to
-	result = deviceContext->Map(m_matrixBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
+	result = m_matrixBuffer->Map(D3D10_MAP_WRITE_DISCARD, 0, &mappedResource);
 	if (FAILED(result))
 	{
 		return false;
 	}
 
 	// Get a pointer to the data in the constant buffer
-	dataPtr = (MatrixBufferType*)mappedResource.pData;
+	dataPtr = (MatrixBufferType*)mappedResource;
 
 	// Copy the matrices into the constant buffer
 	dataPtr->world = worldMatrix;
@@ -298,34 +297,34 @@ bool SkyDomeShaderClass::SetShaderParameters(ID3D11DeviceContext* deviceContext,
 	dataPtr->projection = projectionMatrix;
 
 	// Unlock the constant buffer
-	deviceContext->Unmap(m_matrixBuffer, 0);
+	m_matrixBuffer->Unmap();
 
 	// Set the position of the constant buffer in the vertex shader
 	bufferNumber = 0;
 
 	// Finanly set the constant buffer in the vertex shader with the updated values
-	deviceContext->VSSetConstantBuffers(bufferNumber, 1, &m_matrixBuffer);
+	device->VSSetConstantBuffers(bufferNumber, 1, &m_matrixBuffer);
 
 	// Set shader cubemap resource in the pixel shader
-	deviceContext->PSSetShaderResources(0, 1, &cubeMap);
+	device->PSSetShaderResources(0, 1, &cubeMap);
 
 	return true;
 }
 
-void SkyDomeShaderClass::RenderShader(ID3D11DeviceContext* deviceContext, int indexCount)
+void SkyDomeShaderClass::RenderShader(ID3D10Device* device, int indexCount)
 {
 	// Set the vertex input layout
-	deviceContext->IASetInputLayout(m_layout);
+	device->IASetInputLayout(m_layout);
 
 	// Set the vertex and pixel shaders that will be used to render this triangle
-	deviceContext->VSSetShader(m_vertexShader, NULL, 0);
-	deviceContext->PSSetShader(m_pixelShader, NULL, 0);
+	device->VSSetShader(m_vertexShader);
+	device->PSSetShader(m_pixelShader);
 
 	// Set the sampler state in the pixel shader
-	deviceContext->PSSetSamplers(0, 1, &m_sampleState);
+	device->PSSetSamplers(0, 1, &m_sampleState);
 
 	// Render the triangle
-	deviceContext->DrawIndexed(indexCount, 0, 0);
+	device->DrawIndexed(indexCount, 0, 0);
 
 	return;
 }

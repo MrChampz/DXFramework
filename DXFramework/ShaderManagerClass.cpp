@@ -26,7 +26,7 @@ ShaderManagerClass::~ShaderManagerClass()
 {
 }
 
-bool ShaderManagerClass::Initialize(ID3D11Device* device, HWND hwnd)
+bool ShaderManagerClass::Initialize(ID3D10Device* device, HWND hwnd)
 {
 	bool result;
 
@@ -281,83 +281,83 @@ void ShaderManagerClass::Shutdown()
 	return;
 }
 
-bool ShaderManagerClass::RenderColorShader(ID3D11DeviceContext* deviceContext, int indexCount,
+bool ShaderManagerClass::RenderColorShader(ID3D10Device* device, int indexCount,
 	XMMATRIX worldMatrix, XMMATRIX viewMatrix, XMMATRIX projectionMatrix)
 {
-	return m_ColorShader->Render(deviceContext, indexCount, worldMatrix, viewMatrix, projectionMatrix);
+	return m_ColorShader->Render(device, indexCount, worldMatrix, viewMatrix, projectionMatrix);
 }
 
-bool ShaderManagerClass::RenderTextureShader(ID3D11DeviceContext* deviceContext, int indexCount,
-	XMMATRIX worldMatrix, XMMATRIX viewMatrix, XMMATRIX projectionMatrix, ID3D11ShaderResourceView* texture)
+bool ShaderManagerClass::RenderTextureShader(ID3D10Device* device, int indexCount,
+	XMMATRIX worldMatrix, XMMATRIX viewMatrix, XMMATRIX projectionMatrix, ID3D10ShaderResourceView* texture)
 {
-	return m_TextureShader->Render(deviceContext, indexCount, worldMatrix, viewMatrix, projectionMatrix, texture);
+	return m_TextureShader->Render(device, indexCount, worldMatrix, viewMatrix, projectionMatrix, texture);
 }
 
-bool ShaderManagerClass::RenderBumpMapShader(ID3D11DeviceContext* deviceContext, int indexCount, XMMATRIX worldMatrix,
-	XMMATRIX viewMatrix, XMMATRIX projectionMatrix, ID3D11ShaderResourceView** textureArray, XMFLOAT3 lightDirection,
+bool ShaderManagerClass::RenderBumpMapShader(ID3D10Device* device, int indexCount, XMMATRIX worldMatrix,
+	XMMATRIX viewMatrix, XMMATRIX projectionMatrix, ID3D10ShaderResourceView** textureArray, XMFLOAT3 lightDirection,
 	XMFLOAT4 diffuseColor)
 {
-	return m_BumMapShader->Render(deviceContext, indexCount, worldMatrix, viewMatrix, projectionMatrix, textureArray,
+	return m_BumMapShader->Render(device, indexCount, worldMatrix, viewMatrix, projectionMatrix, textureArray,
 		lightDirection, diffuseColor);
 }
 
-bool ShaderManagerClass::RenderSpecMapShader(ID3D11DeviceContext* deviceContext, int indexCount, XMMATRIX worldMatrix,
-	XMMATRIX viewMatrix, XMMATRIX projectionMatrix, ID3D11ShaderResourceView** textureArray, XMFLOAT3 lightDirection,
+bool ShaderManagerClass::RenderSpecMapShader(ID3D10Device* device, int indexCount, XMMATRIX worldMatrix,
+	XMMATRIX viewMatrix, XMMATRIX projectionMatrix, ID3D10ShaderResourceView** textureArray, XMFLOAT3 lightDirection,
 	XMFLOAT4 diffuseColor, XMFLOAT3 cameraPosition, XMFLOAT4 specularColor, float specularPower)
 {
-	return m_SpecMapShader->Render(deviceContext, indexCount, worldMatrix, viewMatrix, projectionMatrix, textureArray,
+	return m_SpecMapShader->Render(device, indexCount, worldMatrix, viewMatrix, projectionMatrix, textureArray,
 		lightDirection, diffuseColor, cameraPosition, specularColor, specularPower);
 }
 
-bool ShaderManagerClass::RenderLightShader(ID3D11DeviceContext* deviceContext, int indexCount, XMMATRIX worldMatrix,
-	XMMATRIX viewMatrix, XMMATRIX projectionMatrix, ID3D11ShaderResourceView* texture, XMFLOAT3 cameraPosition,
+bool ShaderManagerClass::RenderLightShader(ID3D10Device* device, int indexCount, XMMATRIX worldMatrix,
+	XMMATRIX viewMatrix, XMMATRIX projectionMatrix, ID3D10ShaderResourceView* texture, XMFLOAT3 cameraPosition,
 	XMFLOAT3 lightDirection, XMFLOAT4 diffuseColor)
 {
-	return m_LightShader->Render(deviceContext, indexCount, worldMatrix, viewMatrix, projectionMatrix, texture, lightDirection,
+	return m_LightShader->Render(device, indexCount, worldMatrix, viewMatrix, projectionMatrix, texture, lightDirection,
 		diffuseColor, cameraPosition);
 }
 
-bool ShaderManagerClass::RenderReflectionShader(ID3D11DeviceContext* deviceContext, int indexCount, XMMATRIX worldMatrix,
-	XMMATRIX viewMatrix, XMMATRIX projectionMatrix, ID3D11ShaderResourceView* texture, ID3D11ShaderResourceView* normalMap,
+bool ShaderManagerClass::RenderReflectionShader(ID3D10Device* device, int indexCount, XMMATRIX worldMatrix,
+	XMMATRIX viewMatrix, XMMATRIX projectionMatrix, ID3D10ShaderResourceView* texture, ID3D10ShaderResourceView* normalMap,
 	XMFLOAT4 diffuseColor, XMFLOAT3 lightDirection, float colorTextureBrightness, XMFLOAT4 clipPlane)
 {
-	return m_ReflectionShader->Render(deviceContext, indexCount, worldMatrix, viewMatrix, projectionMatrix,
+	return m_ReflectionShader->Render(device, indexCount, worldMatrix, viewMatrix, projectionMatrix,
 		texture, normalMap, diffuseColor, lightDirection, colorTextureBrightness, clipPlane);
 }
 
-bool ShaderManagerClass::RenderFontShader(ID3D11DeviceContext* deviceContext, int indexCount, XMMATRIX worldMatrix,
-	XMMATRIX viewMatrix,	XMMATRIX projectionMatrix, ID3D11ShaderResourceView* texture, XMFLOAT4 color)
+bool ShaderManagerClass::RenderFontShader(ID3D10Device* device, int indexCount, XMMATRIX worldMatrix,
+	XMMATRIX viewMatrix,	XMMATRIX projectionMatrix, ID3D10ShaderResourceView* texture, XMFLOAT4 color)
 {
-	return m_FontShader->Render(deviceContext, indexCount, worldMatrix, viewMatrix, projectionMatrix, texture, color);
+	return m_FontShader->Render(device, indexCount, worldMatrix, viewMatrix, projectionMatrix, texture, color);
 }
 
-bool ShaderManagerClass::RenderMiniMapShader(ID3D11DeviceContext* deviceContext, int indexCount,
-	XMMATRIX worldMatrix, XMMATRIX viewMatrix, XMMATRIX projectionMatrix, ID3D11ShaderResourceView* texture)
+bool ShaderManagerClass::RenderMiniMapShader(ID3D10Device* device, int indexCount,
+	XMMATRIX worldMatrix, XMMATRIX viewMatrix, XMMATRIX projectionMatrix, ID3D10ShaderResourceView* texture)
 {
-	return m_MiniMapShader->Render(deviceContext, indexCount, worldMatrix, viewMatrix, projectionMatrix, texture);
+	return m_MiniMapShader->Render(device, indexCount, worldMatrix, viewMatrix, projectionMatrix, texture);
 }
 
-bool ShaderManagerClass::RenderSkyDomeShader(ID3D11DeviceContext* deviceContext, int indexCount, XMMATRIX worldMatrix,
-	XMMATRIX viewMatrix, XMMATRIX projectionMatrix, ID3D11ShaderResourceView* cubeMap)
+bool ShaderManagerClass::RenderSkyDomeShader(ID3D10Device* device, int indexCount, XMMATRIX worldMatrix,
+	XMMATRIX viewMatrix, XMMATRIX projectionMatrix, ID3D10ShaderResourceView* cubeMap)
 {
-	return m_SkyDomeShader->Render(deviceContext, indexCount, worldMatrix, viewMatrix, projectionMatrix, cubeMap);
+	return m_SkyDomeShader->Render(device, indexCount, worldMatrix, viewMatrix, projectionMatrix, cubeMap);
 }
 
-bool ShaderManagerClass::RenderWaterShader(ID3D11DeviceContext* deviceContext, int indexCount, XMMATRIX worldMatrix, XMMATRIX viewMatrix,
-	XMMATRIX projectionMatrix, XMMATRIX reflectionMatrix, ID3D11ShaderResourceView* refractionTexture,
-	ID3D11ShaderResourceView* reflectionTexture, ID3D11ShaderResourceView* normalTexture, XMFLOAT3 cameraPosition,
+bool ShaderManagerClass::RenderWaterShader(ID3D10Device* device, int indexCount, XMMATRIX worldMatrix, XMMATRIX viewMatrix,
+	XMMATRIX projectionMatrix, XMMATRIX reflectionMatrix, ID3D10ShaderResourceView* refractionTexture,
+	ID3D10ShaderResourceView* reflectionTexture, ID3D10ShaderResourceView* normalTexture, XMFLOAT3 cameraPosition,
 	XMFLOAT2 normalMapTiling, float waterTranslation, float reflecRefractScale, XMFLOAT4 refractionTint, XMFLOAT3 lightDirection,
 	float specularShininess)
 {
-	return m_WaterShader->Render(deviceContext, indexCount, worldMatrix, viewMatrix, projectionMatrix, reflectionMatrix,
+	return m_WaterShader->Render(device, indexCount, worldMatrix, viewMatrix, projectionMatrix, reflectionMatrix,
 		refractionTexture, reflectionTexture, normalTexture, cameraPosition, normalMapTiling, waterTranslation, reflecRefractScale,
 		refractionTint, lightDirection, specularShininess);
 }
 
-bool ShaderManagerClass::RenderTerrainShader(ID3D11DeviceContext* deviceContext, int indexCount, XMMATRIX worldMatrix,
-	XMMATRIX viewMatrix, XMMATRIX projectionMatrix, ID3D11ShaderResourceView* texture, ID3D11ShaderResourceView* normalMap,
+bool ShaderManagerClass::RenderTerrainShader(ID3D10Device* device, int indexCount, XMMATRIX worldMatrix,
+	XMMATRIX viewMatrix, XMMATRIX projectionMatrix, ID3D10ShaderResourceView* texture, ID3D10ShaderResourceView* normalMap,
 	XMFLOAT3 lightDirection, XMFLOAT4 diffuseColor)
 {
-	return m_TerrainShader->Render(deviceContext, indexCount, worldMatrix, viewMatrix, projectionMatrix, texture, normalMap,
+	return m_TerrainShader->Render(device, indexCount, worldMatrix, viewMatrix, projectionMatrix, texture, normalMap,
 		lightDirection, diffuseColor);
 }

@@ -19,9 +19,9 @@ public:
 	MiniMapClass(const MiniMapClass&);
 	~MiniMapClass();
 
-	bool Initialize(ID3D11Device*, ID3D11DeviceContext*, int, int, float, float);
+	bool Initialize(ID3D10Device*, int, int, float, float);
 	void Shutdown();
-	bool Render(ID3D11DeviceContext*, ShaderManagerClass*, XMMATRIX, XMMATRIX, XMMATRIX);
+	bool Render(ID3D10Device*, ShaderManagerClass*, XMMATRIX, XMMATRIX, XMMATRIX);
 
 	void PointPositionUpdate(float, float, float);
 	void EnemyPositionUpdate(float, float);

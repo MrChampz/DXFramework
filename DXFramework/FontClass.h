@@ -6,8 +6,8 @@
 /////////////////////////////////////////////
 //	INCLUDES
 /////////////////////////////////////////////
-#include <d3d11.h>
 #include <DirectXMath.h>
+#include <d3d10.h>
 #include <fstream>
 using namespace DirectX;
 using namespace std;
@@ -40,10 +40,10 @@ public:
 	FontClass(const FontClass&);
 	~FontClass();
 
-	bool Initialize(ID3D11Device*, ID3D11DeviceContext*, char*, char*, float, int);
+	bool Initialize(ID3D10Device*, char*, char*, float, int);
 	void Shutdown();
 
-	ID3D11ShaderResourceView* GetTexture();
+	ID3D10ShaderResourceView* GetTexture();
 	void BuildVertexArray(void*, char*, float, float);
 	int GetSentencePixelLength(char*);
 	int GetFontHeight();
@@ -51,7 +51,7 @@ public:
 private:
 	bool LoadFontData(char*);
 	void ReleaseFontData();
-	bool LoadTexture(ID3D11Device*, ID3D11DeviceContext*, char*);
+	bool LoadTexture(ID3D10Device*, char*);
 	void ReleaseTexture();
 
 private:

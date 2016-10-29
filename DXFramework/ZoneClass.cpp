@@ -129,7 +129,7 @@ bool ZoneClass::Initialize(D3DClass* Direct3D, HWND hwnd, int screenWidth, int s
 	}
 
 	// Initialize the skydome object
-	result = m_SkyDome->Initialize(Direct3D->GetDevice(), Direct3D->GetDeviceContext());
+	result = m_SkyDome->Initialize(Direct3D->GetDevice());
 	if (!result)
 	{
 		MessageBox(hwnd, L"Could not initialize the SkyDome object", L"Error", MB_OK);
@@ -144,7 +144,7 @@ bool ZoneClass::Initialize(D3DClass* Direct3D, HWND hwnd, int screenWidth, int s
 	}
 
 	// Initialize the Water object
-	result = m_Water->Initialize(Direct3D->GetDevice(), Direct3D->GetDeviceContext(), "Data/Water_normal.tga", 40.0f, 800.0f);
+	result = m_Water->Initialize(Direct3D->GetDevice(), "Data/Water_normal.tga", 40.0f, 800.0f);
 	if (!result)
 	{
 		MessageBox(hwnd, L"Could not initialize the Water object", L"Error", MB_OK);
@@ -174,8 +174,7 @@ bool ZoneClass::Initialize(D3DClass* Direct3D, HWND hwnd, int screenWidth, int s
 	}
 
 	// Initialize the Model object
-	result = m_Model->Initialize(Direct3D->GetDevice(), Direct3D->GetDeviceContext(),
-		"Data/Cube.vin", "Data/Tile_diff.tga", "Data/Tile_norm.tga", "Data/Tile_spec.tga");
+	result = m_Model->Initialize(Direct3D->GetDevice(), "Data/Cube.vin", "Data/Tile_diff.tga", "Data/Tile_norm.tga", "Data/Tile_spec.tga");
 	if (!result)
 	{
 		MessageBox(hwnd, L"Could not initialize the Model object", L"Error", MB_OK);
@@ -306,7 +305,7 @@ bool ZoneClass::Frame(D3DClass* Direct3D, InputClass* Input, ShaderManagerClass*
 	m_Position->GetRotation(rotX, rotY, rotZ);
 
 	// Do the frame processing for the UserInterface
-	result = m_UserInterface->Frame(Direct3D->GetDeviceContext(), fps, posX, posY, posZ, rotX, rotY, rotZ,
+	result = m_UserInterface->Frame(Direct3D->GetDevice(), fps, posX, posY, posZ, rotX, rotY, rotZ,
 		m_modelPosX, m_modelPosZ);
 	if (!result)
 	{
@@ -418,10 +417,10 @@ void ZoneClass::RenderRefractionToTexture(D3DClass* Direct3D, ShaderManagerClass
 	clipPlane = XMFLOAT4(0.0f, -1.0f, 0.0f, m_Water->GetWaterHeight() + 0.1f);
 
 	// Set the render target to be the refraction render to texture.
-	m_RefractionTexture->SetRenderTarget(Direct3D->GetDeviceContext());
+	m_RefractionTexture->SetRenderTarget(Direct3D->GetDevice());
 
 	// Clear the refraction render to texture.
-	m_RefractionTexture->ClearRenderTarget(Direct3D->GetDeviceContext(), 0.0f, 0.0f, 0.0f, 1.0f);
+	m_RefractionTexture->ClearRenderTarget(Direct3D->GetDevice(), 0.0f, 0.0f, 0.0f, 1.0f);
 
 	// Generate the view matrix based on the camera's position.
 	m_Camera->Render();
@@ -438,11 +437,11 @@ void ZoneClass::RenderRefractionToTexture(D3DClass* Direct3D, ShaderManagerClass
 	for (i = 0; i < m_Terrain->GetCellCount(); i++)
 	{
 		// Render each terrain cell if it is visible only.
-		result = m_Terrain->RenderCell(Direct3D->GetDeviceContext(), i, m_Frustum);
+		result = m_Terrain->RenderCell(Direct3D->GetDevice(), i, m_Frustum);
 		if (result)
 		{
 			// Render the cell buffers using the terrain shader.
-			result = ShaderManager->RenderTerrainShader(Direct3D->GetDeviceContext(), m_Terrain->GetCellIndexCount(i),
+			result = ShaderManager->RenderTerrainShader(Direct3D->GetDevice(), m_Terrain->GetCellIndexCount(i),
 				worldMatrix, viewMatrix, projectionMatrix, TextureManager->GetTexture(0), TextureManager->GetTexture(1),
 				m_Light->GetDirection(), m_Light->GetDiffuseColor());
 		}
@@ -469,10 +468,10 @@ void ZoneClass::RenderReflectionToTexture(D3DClass* Direct3D, ShaderManagerClass
 	clipPlane = XMFLOAT4(0.0f, 1.0f, 0.0f, -m_Water->GetWaterHeight());
 
 	// Set the render target to be the refraction render to texture.
-	m_ReflectionTexture->SetRenderTarget(Direct3D->GetDeviceContext());
+	m_ReflectionTexture->SetRenderTarget(Direct3D->GetDevice());
 
 	// Clear the refraction render to texture.
-	m_ReflectionTexture->ClearRenderTarget(Direct3D->GetDeviceContext(), 0.0f, 0.0f, 0.0f, 1.0f);
+	m_ReflectionTexture->ClearRenderTarget(Direct3D->GetDevice(), 0.0f, 0.0f, 0.0f, 1.0f);
 
 	// Generate the view matrix based on the camera's position.
 	m_Camera->RenderReflection(m_Water->GetWaterHeight());
@@ -498,8 +497,8 @@ void ZoneClass::RenderReflectionToTexture(D3DClass* Direct3D, ShaderManagerClass
 	worldMatrix = XMMatrixTranslation(cameraPosition.x, cameraPosition.y, cameraPosition.z);
 
 	// Render the sky dome using the sky dome shader.
-	m_SkyDome->Render(Direct3D->GetDeviceContext());
-	result = ShaderManager->RenderSkyDomeShader(Direct3D->GetDeviceContext(), m_SkyDome->GetIndexCount(), worldMatrix,
+	m_SkyDome->Render(Direct3D->GetDevice());
+	result = ShaderManager->RenderSkyDomeShader(Direct3D->GetDevice(), m_SkyDome->GetIndexCount(), worldMatrix,
 		reflectionViewMatrix, projectionMatrix, m_SkyDome->GetCubeMap());
 
 	// Reset the world matrix
@@ -517,12 +516,12 @@ void ZoneClass::RenderReflectionToTexture(D3DClass* Direct3D, ShaderManagerClass
 	for (i = 0; i < m_Terrain->GetCellCount(); i++)
 	{
 		// Render all terrain cells
-		result = m_Terrain->RenderAllCells(Direct3D->GetDeviceContext(), i);
+		result = m_Terrain->RenderAllCells(Direct3D->GetDevice(), i);
 
 		if (result)
 		{
 			// Render the cell buffers using the terrain shader.
-			result = ShaderManager->RenderReflectionShader(Direct3D->GetDeviceContext(), m_Terrain->GetCellIndexCount(i),
+			result = ShaderManager->RenderReflectionShader(Direct3D->GetDevice(), m_Terrain->GetCellIndexCount(i),
 				worldMatrix, reflectionViewMatrix, projectionMatrix, TextureManager->GetTexture(0), TextureManager->GetTexture(1),
 				m_Light->GetDiffuseColor(), m_Light->GetDirection(), 2.0f, clipPlane);
 		}
@@ -530,8 +529,8 @@ void ZoneClass::RenderReflectionToTexture(D3DClass* Direct3D, ShaderManagerClass
 
 	worldMatrix = XMMatrixTranslation(m_modelPosX, m_modelPosY, m_modelPosZ);
 
-	m_Model->Render(Direct3D->GetDeviceContext());
-	result = ShaderManager->RenderTextureShader(Direct3D->GetDeviceContext(), m_Model->GetIndexCount(), worldMatrix, reflectionViewMatrix,
+	m_Model->Render(Direct3D->GetDevice());
+	result = ShaderManager->RenderTextureShader(Direct3D->GetDevice(), m_Model->GetIndexCount(), worldMatrix, reflectionViewMatrix,
 		projectionMatrix, *m_Model->GetTextureArray());
 
 	Direct3D->GetWorldMatrix(worldMatrix);
@@ -583,8 +582,8 @@ bool ZoneClass::Render(D3DClass* Direct3D, ShaderManagerClass* ShaderManager, Te
 	worldMatrix = XMMatrixTranslation(cameraPosition.x, cameraPosition.y, cameraPosition.z);
 
 	// Render the sky dome using the sky dome shader.
-	m_SkyDome->Render(Direct3D->GetDeviceContext());
-	result = ShaderManager->RenderSkyDomeShader(Direct3D->GetDeviceContext(), m_SkyDome->GetIndexCount(), worldMatrix, viewMatrix,
+	m_SkyDome->Render(Direct3D->GetDevice());
+	result = ShaderManager->RenderSkyDomeShader(Direct3D->GetDevice(), m_SkyDome->GetIndexCount(), worldMatrix, viewMatrix,
 		projectionMatrix, m_SkyDome->GetCubeMap());
 	if (!result)
 	{
@@ -608,11 +607,11 @@ bool ZoneClass::Render(D3DClass* Direct3D, ShaderManagerClass* ShaderManager, Te
 	for (i = 0; i < m_Terrain->GetCellCount(); i++)
 	{
 		// Render each terrain cell if it is visible only.
-		result = m_Terrain->RenderCell(Direct3D->GetDeviceContext(), i, m_Frustum);
+		result = m_Terrain->RenderCell(Direct3D->GetDevice(), i, m_Frustum);
 		if (result)
 		{
 			// Render the cell buffers using the terrain shader.
-			result = ShaderManager->RenderTerrainShader(Direct3D->GetDeviceContext(), m_Terrain->GetCellIndexCount(i),
+			result = ShaderManager->RenderTerrainShader(Direct3D->GetDevice(), m_Terrain->GetCellIndexCount(i),
 				worldMatrix, viewMatrix, projectionMatrix, TextureManager->GetTexture(0), TextureManager->GetTexture(1),
 				m_Light->GetDirection(), m_Light->GetDiffuseColor());
 			if (!result)
@@ -623,8 +622,8 @@ bool ZoneClass::Render(D3DClass* Direct3D, ShaderManagerClass* ShaderManager, Te
 			// If needed then render the bounding box around this terrain cell using the color shader. 
 			if (m_cellLines)
 			{
-				m_Terrain->RenderCellLines(Direct3D->GetDeviceContext(), i);
-				ShaderManager->RenderColorShader(Direct3D->GetDeviceContext(), m_Terrain->GetCellLinesIndexCount(i),
+				m_Terrain->RenderCellLines(Direct3D->GetDevice(), i);
+				ShaderManager->RenderColorShader(Direct3D->GetDevice(), m_Terrain->GetCellLinesIndexCount(i),
 					worldMatrix, viewMatrix, projectionMatrix);
 				if (!result)
 				{
@@ -640,8 +639,8 @@ bool ZoneClass::Render(D3DClass* Direct3D, ShaderManagerClass* ShaderManager, Te
 
 	worldMatrix = XMMatrixTranslation(m_modelPosX, m_modelPosY, m_modelPosZ);
 
-	m_Model->Render(Direct3D->GetDeviceContext());
-	result = ShaderManager->RenderSpecMapShader(Direct3D->GetDeviceContext(), m_Model->GetIndexCount(), worldMatrix, viewMatrix,
+	m_Model->Render(Direct3D->GetDevice());
+	result = ShaderManager->RenderSpecMapShader(Direct3D->GetDevice(), m_Model->GetIndexCount(), worldMatrix, viewMatrix,
 		projectionMatrix, m_Model->GetTextureArray(), m_Light->GetDirection(), m_Light->GetDiffuseColor(), m_Camera->GetPosition(),
 		m_Light->GetSpecularColor(), m_Light->GetSpecularPower());
 	if (!result)
@@ -660,7 +659,7 @@ bool ZoneClass::Render(D3DClass* Direct3D, ShaderManagerClass* ShaderManager, Te
 	}
 
 	// Update the render counts in the UI.
-	result = m_UserInterface->UpdateRenderCounts(Direct3D->GetDeviceContext(), m_Terrain->GetRenderCount(),
+	result = m_UserInterface->UpdateRenderCounts(Direct3D->GetDevice(), m_Terrain->GetRenderCount(),
 		m_Terrain->GetCellsDrawn(), m_Terrain->GetCellsCulled());
 	if (!result)
 	{
