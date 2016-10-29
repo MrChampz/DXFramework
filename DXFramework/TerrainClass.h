@@ -6,8 +6,9 @@
 /////////////////////////////////////////////
 //	INCLUDES
 /////////////////////////////////////////////
-#include <DirectXMath.h>
+#include <d3d10_1.h>
 #include <d3d10.h>
+#include <DirectXMath.h>
 #include <fstream>
 #include <stdio.h>
 using namespace DirectX;

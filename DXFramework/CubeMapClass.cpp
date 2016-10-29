@@ -21,12 +21,12 @@ bool CubeMapClass::Initialize(ID3D10Device* device, wchar_t* filename)
 	HRESULT result;
 
 	// Load the DDS cubemap and create the texture view
-	result = CreateDDSTextureFromFileEx(device, filename, 0, D3D11_USAGE_DEFAULT, D3D11_BIND_SHADER_RESOURCE, 0, 
-		D3D11_RESOURCE_MISC_TEXTURECUBE, false, nullptr, &m_textureView, nullptr);
-	if (FAILED(result))
-	{
-		return false;
-	}
+	//result = CreateDDSTextureFromFileEx(device, filename, 0, D3D10_USAGE_DEFAULT, D3D10_BIND_SHADER_RESOURCE, 0, 
+	//	D3D10_RESOURCE_MISC_TEXTURECUBE, false, nullptr, &m_textureView, nullptr);
+	//if (FAILED(result))
+	//{
+	//	return false;
+	//}
 
 	return true;
 }
