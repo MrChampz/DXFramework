@@ -144,6 +144,15 @@
     <ClCompile Include="MiniMapShaderClass.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="RenderTextureClass.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="BumpMapShaderClass.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="SpecMapShaderClass.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="SystemClass.h">
@@ -272,6 +281,15 @@
     <ClInclude Include="MiniMapShaderClass.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="RenderTextureClass.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="BumpMapShaderClass.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SpecMapShaderClass.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Shaders\Color.ps">
@@ -345,6 +363,18 @@
       <Filter>Shaders</Filter>
     </None>
     <None Include="Shaders\MiniMap.vs">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="Shaders\BumpMap.ps">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="Shaders\BumpMap.vs">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="Shaders\SpecMap.ps">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="Shaders\SpecMap.vs">
       <Filter>Shaders</Filter>
     </None>
   </ItemGroup>

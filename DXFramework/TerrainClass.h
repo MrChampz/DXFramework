@@ -74,6 +74,7 @@ public:
 	void Frame();
 
 	bool RenderCell(ID3D11DeviceContext*, int, FrustumClass*);
+	bool RenderAllCells(ID3D11DeviceContext*, int);
 	void RenderCellLines(ID3D11DeviceContext*, int);
 
 	int GetCellIndexCount(int);

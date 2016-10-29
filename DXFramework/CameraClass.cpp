@@ -178,7 +178,7 @@ void CameraClass::RenderReflection(float height)
 
 	// Setup the vector that points upwards
 	up.x = 0.0f;
-	up.y = 1.0f + (height * 2.0f);
+	up.y = 1.0f;
 	up.z = 0.0f;
 
 	// Load it into a XMVECTOR structure
@@ -186,7 +186,7 @@ void CameraClass::RenderReflection(float height)
 
 	// Setup the position of the camera in the world
 	position.x = m_positionX;
-	position.y = m_positionY;
+	position.y = -m_positionY + (height * 2.0f);
 	position.z = m_positionZ;
 
 	// Load it into a XMVECTOR structure

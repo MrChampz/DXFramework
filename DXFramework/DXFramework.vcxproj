@@ -114,6 +114,7 @@
     <ClCompile Include="AlphaMapShaderClass.cpp" />
     <ClCompile Include="ApplicationClass.cpp" />
     <ClCompile Include="BitmapClass.cpp" />
+    <ClCompile Include="BumpMapShaderClass.cpp" />
     <ClCompile Include="CameraClass.cpp" />
     <ClCompile Include="ColorShaderClass.cpp" />
     <ClCompile Include="CpuClass.cpp" />
@@ -135,10 +136,12 @@
     <ClCompile Include="MultiTextureShaderClass.cpp" />
     <ClCompile Include="PositionClass.cpp" />
     <ClCompile Include="ReflectionShaderClass.cpp" />
+    <ClCompile Include="RenderTextureClass.cpp" />
     <ClCompile Include="ShaderManagerClass.cpp" />
     <ClCompile Include="SkyDomeClass.cpp" />
     <ClCompile Include="SkyDomeShaderClass.cpp" />
     <ClCompile Include="SoundClass.cpp" />
+    <ClCompile Include="SpecMapShaderClass.cpp" />
     <ClCompile Include="SystemClass.cpp" />
     <ClCompile Include="TerrainCellClass.cpp" />
     <ClCompile Include="TerrainClass.cpp" />
@@ -158,6 +161,7 @@
     <ClInclude Include="AlphaMapShaderClass.h" />
     <ClInclude Include="ApplicationClass.h" />
     <ClInclude Include="BitmapClass.h" />
+    <ClInclude Include="BumpMapShaderClass.h" />
     <ClInclude Include="CameraClass.h" />
     <ClInclude Include="ColorShaderClass.h" />
     <ClInclude Include="CpuClass.h" />
@@ -178,11 +182,13 @@
     <ClInclude Include="MultiTextureShaderClass.h" />
     <ClInclude Include="PositionClass.h" />
     <ClInclude Include="ReflectionShaderClass.h" />
+    <ClInclude Include="RenderTextureClass.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="ShaderManagerClass.h" />
     <ClInclude Include="SkyDomeClass.h" />
     <ClInclude Include="SkyDomeShaderClass.h" />
     <ClInclude Include="SoundClass.h" />
+    <ClInclude Include="SpecMapShaderClass.h" />
     <ClInclude Include="SystemClass.h" />
     <ClInclude Include="TerrainCellClass.h" />
     <ClInclude Include="TerrainClass.h" />
@@ -202,6 +208,8 @@
     <None Include="packages.config" />
     <None Include="Shaders\AlphaMap.ps" />
     <None Include="Shaders\AlphaMap.vs" />
+    <None Include="Shaders\BumpMap.ps" />
+    <None Include="Shaders\BumpMap.vs" />
     <None Include="Shaders\Color.ps" />
     <None Include="Shaders\Color.vs" />
     <None Include="Shaders\Font.ps" />
@@ -218,6 +226,8 @@
     <None Include="Shaders\Reflection.vs" />
     <None Include="Shaders\SkyDome.ps" />
     <None Include="Shaders\SkyDome.vs" />
+    <None Include="Shaders\SpecMap.ps" />
+    <None Include="Shaders\SpecMap.vs" />
     <None Include="Shaders\Terrain.ps" />
     <None Include="Shaders\Terrain.vs" />
     <None Include="Shaders\Texture.ps" />

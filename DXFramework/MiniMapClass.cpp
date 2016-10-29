@@ -62,7 +62,7 @@ bool MiniMapClass::Initialize(ID3D11Device* device, ID3D11DeviceContext* deviceC
 	}
 
 	// Initialize the mini-map bitmap object
-	result = m_MiniMapBitmap->Initialize(device, deviceContext, screenWidth, screenHeight, "Data/Maps/Map02/MiniMap.tga",
+	result = m_MiniMapBitmap->Initialize(device, deviceContext, screenWidth, screenHeight, "Data/Maps/Map03/MiniMap.tga",
 		150, 150);
 	if (!result)
 	{

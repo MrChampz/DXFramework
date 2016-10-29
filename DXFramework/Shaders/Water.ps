@@ -5,7 +5,7 @@
 /////////////////////////////////////////////
 //	SAMPLERS
 /////////////////////////////////////////////
-SamplerState SamplerType;
+SamplerState SampleType;
 
 /////////////////////////////////////////////
 //	TEXTURES
@@ -123,5 +123,5 @@ float4 WaterPixelShader(PixelInputType input) : SV_TARGET
         color = saturate(color + specular);
     }
 
-	return color;
+	return reflectionColor;
 }

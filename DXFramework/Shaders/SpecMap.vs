@@ -1,24 +1,20 @@
 /////////////////////////////////////////////
-//	Filename: Water.vs
+//	Filename: SpecMap.vs
 /////////////////////////////////////////////
 
 /////////////////////////////////////////////
-//	CONSTANT BUFFERS
+//	GLOBALS
 /////////////////////////////////////////////
 cbuffer MatrixBuffer
 {
 	matrix worldMatrix;
 	matrix viewMatrix;
 	matrix projectionMatrix;
-	matrix reflectionMatrix;
 };
 
-cbuffer CamNormBuffer
+cbuffer CameraBuffer
 {
 	float3 cameraPosition;
-	float padding1;
-	float2 normalMapTiling;
-	float2 padding2;
 };
 
 /////////////////////////////////////////////
@@ -28,26 +24,27 @@ struct VertexInputType
 {
 	float4 position : POSITION;
 	float2 tex : TEXCOORD0;
+	float3 normal : NORMAL;
+	float3 tangent : TANGENT;
+	float3 binormal : BINORMAL;
 };
 
 struct PixelInputType
 {
 	float4 position : SV_POSITION;
-	float4 reflectionPosition : TEXCOORD0;
-	float4 refractionPosition : TEXCOORD1;
-	float3 viewDirection : TEXCOORD2;
-	float2 tex1 : TEXCOORD3;
-	float2 tex2 : TEXCOORD4;
+	float2 tex : TEXCOORD0;
+	float3 normal : NORMAL;
+	float3 tangent : TANGENT;
+	float3 binormal : BINORMAL;
+	float3 viewDirection : TEXCOORD1;
 };
 
 /////////////////////////////////////////////
 //	Vertex Shader
 /////////////////////////////////////////////
-PixelInputType WaterVertexShader(VertexInputType input)
+PixelInputType SpecMapVertexShader(VertexInputType input)
 {
 	PixelInputType output;
-	matrix reflectProjectWorld;
-	matrix viewProjectWorld;
 	float4 worldPosition;
 
 	// Change the position vector to be 4 units for proper matrix calculations
@@ -58,19 +55,20 @@ PixelInputType WaterVertexShader(VertexInputType input)
 	output.position = mul(output.position, viewMatrix);
 	output.position = mul(output.position, projectionMatrix);
 
-	// Create the reflection projection world matrix
-	reflectProjectWorld = mul(reflectionMatrix, projectionMatrix);
-	reflectProjectWorld = mul(worldMatrix, reflectProjectWorld);
+	// Store the texture coordinates for the pixel shader
+	output.tex = input.tex;
 
-	// Calculate the input position against the reflectProjectWorld matrix
-	output.reflectionPosition = mul(input.position, reflectProjectWorld);
+	// Calculate the normal vector against the world matrix only and then normalize the final value
+	output.normal = mul(input.normal, (float3x3)worldMatrix);
+	output.normal = normalize(output.normal);
 
-	// Create the view projection world matrix for refraction
-	viewProjectWorld = mul(viewMatrix, projectionMatrix);
-	viewProjectWorld = mul(worldMatrix, viewProjectWorld);
+	// Calculate the tangent vector against the world matrix only and then normalize the final value
+	output.tangent = mul(input.tangent, (float3x3)worldMatrix);
+	output.tangent = normalize(output.tangent);
 
-	// Calculate the input position against the viewProjectWorld matrix
-	output.refractionPosition = mul(input.position, viewProjectWorld);
+	// Calculate the binormal vector against the world matrix only and then normalize the final value
+	output.binormal = mul(input.binormal, (float3x3)worldMatrix);
+	output.binormal = normalize(output.binormal);
 
 	// Calculate the position of the vertex in the world
 	worldPosition = mul(input.position, worldMatrix);
@@ -80,10 +78,6 @@ PixelInputType WaterVertexShader(VertexInputType input)
 
 	// Normalize the viewing direction vector
 	output.viewDirection = normalize(output.viewDirection);
-
-	// Create two different texture sample coordinates for tiling the water normal map over the water quad multiple times
-	output.tex1 = input.tex / normalMapTiling.x;
-	output.tex2 = input.tex / normalMapTiling.y;
 
 	return output;
 }

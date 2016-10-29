@@ -7,10 +7,14 @@ ShaderManagerClass::ShaderManagerClass()
 {
 	m_ColorShader = 0;
 	m_TextureShader = 0;
+	m_BumMapShader = 0;
+	m_SpecMapShader = 0;
 	m_LightShader = 0;
+	m_ReflectionShader = 0;
 	m_FontShader = 0;
 	m_MiniMapShader = 0;
 	m_SkyDomeShader = 0;
+	m_WaterShader = 0;
 	m_TerrainShader = 0;
 }
 
@@ -55,6 +59,34 @@ bool ShaderManagerClass::Initialize(ID3D11Device* device, HWND hwnd)
 		return false;
 	}
 
+	// Create the BumpMapShader object.
+	m_BumMapShader = new BumpMapShaderClass;
+	if (!m_BumMapShader)
+	{
+		return false;
+	}
+
+	// Initialize the BumpMapShader object.
+	result = m_BumMapShader->Initialize(device, hwnd);
+	if (!result)
+	{
+		return false;
+	}
+
+	// Create the SpecMapShader object.
+	m_SpecMapShader = new SpecMapShaderClass;
+	if (!m_SpecMapShader)
+	{
+		return false;
+	}
+
+	// Initialize the SpecMapShader object.
+	result = m_SpecMapShader->Initialize(device, hwnd);
+	if (!result)
+	{
+		return false;
+	}
+
 	// Create the light shader object.
 	m_LightShader = new LightShaderClass;
 	if (!m_LightShader)
@@ -64,6 +96,20 @@ bool ShaderManagerClass::Initialize(ID3D11Device* device, HWND hwnd)
 
 	// Initialize the light shader object.
 	result = m_LightShader->Initialize(device, hwnd);
+	if (!result)
+	{
+		return false;
+	}
+
+	// Create the reflection shader object.
+	m_ReflectionShader = new ReflectionShaderClass;
+	if (!m_ReflectionShader)
+	{
+		return false;
+	}
+
+	// Initialize the reflection shader object.
+	result = m_ReflectionShader->Initialize(device, hwnd);
 	if (!result)
 	{
 		return false;
@@ -111,6 +157,20 @@ bool ShaderManagerClass::Initialize(ID3D11Device* device, HWND hwnd)
 		return false;
 	}
 
+	// Create the water shader object.
+	m_WaterShader = new WaterShaderClass;
+	if (!m_WaterShader)
+	{
+		return false;
+	}
+
+	// Initialize the water shader object.
+	result = m_WaterShader->Initialize(device, hwnd);
+	if (!result)
+	{
+		return false;
+	}
+
 	// Create the terrain shader object.
 	m_TerrainShader = new TerrainShaderClass;
 	if (!m_TerrainShader)
@@ -128,7 +188,6 @@ bool ShaderManagerClass::Initialize(ID3D11Device* device, HWND hwnd)
 	return true;
 }
 
-
 void ShaderManagerClass::Shutdown()
 {
 	// Release the terrain shader object.
@@ -137,6 +196,14 @@ void ShaderManagerClass::Shutdown()
 		m_TerrainShader->Shutdown();
 		delete m_TerrainShader;
 		m_TerrainShader = 0;
+	}
+
+	// Release the water shader object.
+	if (m_WaterShader)
+	{
+		m_WaterShader->Shutdown();
+		delete m_WaterShader;
+		m_WaterShader = 0;
 	}
 
 	// Release the skydome shader object.
@@ -161,6 +228,30 @@ void ShaderManagerClass::Shutdown()
 		m_FontShader->Shutdown();
 		delete m_FontShader;
 		m_FontShader = 0;
+	}
+
+	// Release the ReflectionShader object.
+	if (m_ReflectionShader)
+	{
+		m_ReflectionShader->Shutdown();
+		delete m_ReflectionShader;
+		m_ReflectionShader = 0;
+	}
+
+	// Release the SpecMapShader object.
+	if (m_SpecMapShader)
+	{
+		m_SpecMapShader->Shutdown();
+		delete m_SpecMapShader;
+		m_SpecMapShader = 0;
+	}
+
+	// Release the BumpMapShader object.
+	if (m_BumMapShader)
+	{
+		m_BumMapShader->Shutdown();
+		delete m_BumMapShader;
+		m_BumMapShader = 0;
 	}
 
 	// Release the TextureShader object.
@@ -190,7 +281,6 @@ void ShaderManagerClass::Shutdown()
 	return;
 }
 
-
 bool ShaderManagerClass::RenderColorShader(ID3D11DeviceContext* deviceContext, int indexCount,
 	XMMATRIX worldMatrix, XMMATRIX viewMatrix, XMMATRIX projectionMatrix)
 {
@@ -203,12 +293,36 @@ bool ShaderManagerClass::RenderTextureShader(ID3D11DeviceContext* deviceContext,
 	return m_TextureShader->Render(deviceContext, indexCount, worldMatrix, viewMatrix, projectionMatrix, texture);
 }
 
+bool ShaderManagerClass::RenderBumpMapShader(ID3D11DeviceContext* deviceContext, int indexCount, XMMATRIX worldMatrix,
+	XMMATRIX viewMatrix, XMMATRIX projectionMatrix, ID3D11ShaderResourceView** textureArray, XMFLOAT3 lightDirection,
+	XMFLOAT4 diffuseColor)
+{
+	return m_BumMapShader->Render(deviceContext, indexCount, worldMatrix, viewMatrix, projectionMatrix, textureArray,
+		lightDirection, diffuseColor);
+}
+
+bool ShaderManagerClass::RenderSpecMapShader(ID3D11DeviceContext* deviceContext, int indexCount, XMMATRIX worldMatrix,
+	XMMATRIX viewMatrix, XMMATRIX projectionMatrix, ID3D11ShaderResourceView** textureArray, XMFLOAT3 lightDirection,
+	XMFLOAT4 diffuseColor, XMFLOAT3 cameraPosition, XMFLOAT4 specularColor, float specularPower)
+{
+	return m_SpecMapShader->Render(deviceContext, indexCount, worldMatrix, viewMatrix, projectionMatrix, textureArray,
+		lightDirection, diffuseColor, cameraPosition, specularColor, specularPower);
+}
+
 bool ShaderManagerClass::RenderLightShader(ID3D11DeviceContext* deviceContext, int indexCount, XMMATRIX worldMatrix,
 	XMMATRIX viewMatrix, XMMATRIX projectionMatrix, ID3D11ShaderResourceView* texture, XMFLOAT3 cameraPosition,
 	XMFLOAT3 lightDirection, XMFLOAT4 diffuseColor)
 {
 	return m_LightShader->Render(deviceContext, indexCount, worldMatrix, viewMatrix, projectionMatrix, texture, lightDirection,
 		diffuseColor, cameraPosition);
+}
+
+bool ShaderManagerClass::RenderReflectionShader(ID3D11DeviceContext* deviceContext, int indexCount, XMMATRIX worldMatrix,
+	XMMATRIX viewMatrix, XMMATRIX projectionMatrix, ID3D11ShaderResourceView* texture, ID3D11ShaderResourceView* normalMap,
+	XMFLOAT4 diffuseColor, XMFLOAT3 lightDirection, float colorTextureBrightness, XMFLOAT4 clipPlane)
+{
+	return m_ReflectionShader->Render(deviceContext, indexCount, worldMatrix, viewMatrix, projectionMatrix,
+		texture, normalMap, diffuseColor, lightDirection, colorTextureBrightness, clipPlane);
 }
 
 bool ShaderManagerClass::RenderFontShader(ID3D11DeviceContext* deviceContext, int indexCount, XMMATRIX worldMatrix,
@@ -224,9 +338,20 @@ bool ShaderManagerClass::RenderMiniMapShader(ID3D11DeviceContext* deviceContext,
 }
 
 bool ShaderManagerClass::RenderSkyDomeShader(ID3D11DeviceContext* deviceContext, int indexCount, XMMATRIX worldMatrix,
-	XMMATRIX viewMatrix, XMMATRIX projectionMatrix, XMFLOAT4 apexColor, XMFLOAT4 centerColor, ID3D11ShaderResourceView* cubeMap)
+	XMMATRIX viewMatrix, XMMATRIX projectionMatrix, ID3D11ShaderResourceView* cubeMap)
 {
 	return m_SkyDomeShader->Render(deviceContext, indexCount, worldMatrix, viewMatrix, projectionMatrix, cubeMap);
+}
+
+bool ShaderManagerClass::RenderWaterShader(ID3D11DeviceContext* deviceContext, int indexCount, XMMATRIX worldMatrix, XMMATRIX viewMatrix,
+	XMMATRIX projectionMatrix, XMMATRIX reflectionMatrix, ID3D11ShaderResourceView* refractionTexture,
+	ID3D11ShaderResourceView* reflectionTexture, ID3D11ShaderResourceView* normalTexture, XMFLOAT3 cameraPosition,
+	XMFLOAT2 normalMapTiling, float waterTranslation, float reflecRefractScale, XMFLOAT4 refractionTint, XMFLOAT3 lightDirection,
+	float specularShininess)
+{
+	return m_WaterShader->Render(deviceContext, indexCount, worldMatrix, viewMatrix, projectionMatrix, reflectionMatrix,
+		refractionTexture, reflectionTexture, normalTexture, cameraPosition, normalMapTiling, waterTranslation, reflecRefractScale,
+		refractionTint, lightDirection, specularShininess);
 }
 
 bool ShaderManagerClass::RenderTerrainShader(ID3D11DeviceContext* deviceContext, int indexCount, XMMATRIX worldMatrix,

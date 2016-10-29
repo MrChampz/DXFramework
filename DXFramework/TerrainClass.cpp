@@ -1003,6 +1003,21 @@ bool TerrainClass::RenderCell(ID3D11DeviceContext* deviceContext, int cellId, Fr
 	return true;
 }
 
+bool TerrainClass::RenderAllCells(ID3D11DeviceContext* deviceContext, int cellId)
+{
+	bool result;
+
+	// If it is visible then render it.
+	m_TerrainCells[cellId].Render(deviceContext);
+
+	// Add the polygons in the cell to the render count.
+	m_renderCount += (m_TerrainCells[cellId].GetVertexCount() / 3);
+
+	// Increment the number of cells that were actually drawn.
+	m_cellsDrawn++;
+
+	return true;
+}
 
 void TerrainClass::RenderCellLines(ID3D11DeviceContext* deviceContext, int cellId)
 {

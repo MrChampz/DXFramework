@@ -42,6 +42,10 @@ public:
 
 	void GetVideoCardInfo(char*, int&);
 
+	ID3D11DepthStencilView* GetDepthStencilView();
+	void SetBackBufferRenderTarget();
+	void ResetViewport();
+
 	void TurnZBufferOn();
 	void TurnZBufferOff();
 
@@ -71,6 +75,7 @@ private:
 	ID3D11RasterizerState* m_rasterStateWireframe;
 	ID3D11BlendState* m_alphaEnableBlendingState;
 	ID3D11BlendState* m_alphaDisableBlendingState;
+	D3D11_VIEWPORT m_viewport;
 	XMMATRIX m_projectionMatrix;
 	XMMATRIX m_worldMatrix;
 	XMMATRIX m_orthoMatrix;
