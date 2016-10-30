@@ -16,6 +16,9 @@
     <Filter Include="Shaders">
       <UniqueIdentifier>{36817dda-6fcd-4c3a-9fe4-d33456034277}</UniqueIdentifier>
     </Filter>
+    <Filter Include="SandBox">
+      <UniqueIdentifier>{37c9daef-334a-4d58-b504-cdfeee88dfd2}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Main.cpp">
@@ -153,6 +156,9 @@
     <ClCompile Include="SpecMapShaderClass.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="SandBox\TGALoader.cpp">
+      <Filter>SandBox</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="SystemClass.h">
@@ -289,6 +295,9 @@
     </ClInclude>
     <ClInclude Include="SpecMapShaderClass.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SandBox\TGALoader.h">
+      <Filter>SandBox</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

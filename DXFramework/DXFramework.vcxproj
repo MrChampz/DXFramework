@@ -137,6 +137,7 @@
     <ClCompile Include="PositionClass.cpp" />
     <ClCompile Include="ReflectionShaderClass.cpp" />
     <ClCompile Include="RenderTextureClass.cpp" />
+    <ClCompile Include="SandBox\TGALoader.cpp" />
     <ClCompile Include="ShaderManagerClass.cpp" />
     <ClCompile Include="SkyDomeClass.cpp" />
     <ClCompile Include="SkyDomeShaderClass.cpp" />
@@ -184,6 +185,7 @@
     <ClInclude Include="ReflectionShaderClass.h" />
     <ClInclude Include="RenderTextureClass.h" />
     <ClInclude Include="resource.h" />
+    <ClInclude Include="SandBox\TGALoader.h" />
     <ClInclude Include="ShaderManagerClass.h" />
     <ClInclude Include="SkyDomeClass.h" />
     <ClInclude Include="SkyDomeShaderClass.h" />

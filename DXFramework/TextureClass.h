@@ -11,20 +11,15 @@
 #include <stdio.h>
 
 /////////////////////////////////////////////
+//	MY INCLUDES
+/////////////////////////////////////////////
+#include "SandBox\TGALoader.h"
+
+/////////////////////////////////////////////
 //	Class name: TextureClass
 /////////////////////////////////////////////
 class TextureClass
 {
-private:
-	struct TargaHeader
-	{
-		unsigned char data1[12];
-		unsigned short width;
-		unsigned short height;
-		unsigned char bpp;
-		unsigned char data2;
-	};
-
 public:
 	TextureClass();
 	TextureClass(const TextureClass&);
@@ -36,10 +31,5 @@ public:
 	ID3D10ShaderResourceView* GetTexture();
 
 private:
-	bool LoadTarga(char*, int&, int&);
-
-private:
-	unsigned char* m_targaData;
-	ID3D10Texture2D* m_texture;
 	ID3D10ShaderResourceView* m_textureView;
 };

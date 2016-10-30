@@ -31,7 +31,7 @@ bool SkyDomeClass::Initialize(ID3D10Device* device)
 	}
 
 	// Load in the cubemap
-	result = LoadCubeMap(device, L"Data/SkyDome/CubeMap.dds");
+	result = LoadCubeMap(device, "Data/SkyDome/CubeMap.tga");
 	if (!result)
 	{
 		return false;
@@ -282,7 +282,7 @@ void SkyDomeClass::ReleaseSkyDomeModel()
 	return;
 }
 
-bool SkyDomeClass::LoadCubeMap(ID3D10Device* device, wchar_t* filename)
+bool SkyDomeClass::LoadCubeMap(ID3D10Device* device, char* filename)
 {
 	bool result;
 

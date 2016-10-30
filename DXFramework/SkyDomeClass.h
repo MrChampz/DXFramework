@@ -54,7 +54,7 @@ private:
 	bool LoadSkyDomeModel(char*);
 	void ReleaseSkyDomeModel();
 
-	bool LoadCubeMap(ID3D10Device*, wchar_t*);
+	bool LoadCubeMap(ID3D10Device*, char*);
 	void ReleaseCubeMap();
 
 	bool InitializeBuffers(ID3D10Device*);

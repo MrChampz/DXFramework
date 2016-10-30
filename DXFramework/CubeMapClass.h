@@ -9,8 +9,12 @@
 #include <d3d10_1.h>
 #include <d3d10.h>
 #include <DirectXMath.h>
-#include "DDSTextureLoader.h"
 using namespace DirectX;
+
+/////////////////////////////////////////////
+//	MY INCLUDES
+/////////////////////////////////////////////
+#include "SandBox\TGALoader.h"
 
 /////////////////////////////////////////////
 //	Class name: CubeMapClass
@@ -22,7 +26,7 @@ public:
 	CubeMapClass(const CubeMapClass&);
 	~CubeMapClass();
 
-	bool Initialize(ID3D10Device*, wchar_t*);
+	bool Initialize(ID3D10Device*, char*);
 	void Shutdown();
 
 	ID3D10ShaderResourceView* GetCubeMap();

@@ -16,17 +16,16 @@ CubeMapClass::~CubeMapClass()
 {
 }
 
-bool CubeMapClass::Initialize(ID3D10Device* device, wchar_t* filename)
+bool CubeMapClass::Initialize(ID3D10Device* device, char* filename)
 {
-	HRESULT result;
+	bool result;
 
-	// Load the DDS cubemap and create the texture view
-	//result = CreateDDSTextureFromFileEx(device, filename, 0, D3D10_USAGE_DEFAULT, D3D10_BIND_SHADER_RESOURCE, 0, 
-	//	D3D10_RESOURCE_MISC_TEXTURECUBE, false, nullptr, &m_textureView, nullptr);
-	//if (FAILED(result))
-	//{
-	//	return false;
-	//}
+	result = TGALoader::LoadCubeMap(device, "Data/SkyDome/posx.tga", "Data/SkyDome/negx.tga", "Data/SkyDome/posy.tga",
+		"Data/SkyDome/negy.tga", "Data/SkyDome/posz.tga", "Data/SkyDome/negz.tga", &m_textureView);
+	if (!result)
+	{
+		return false;
+	}
 
 	return true;
 }
