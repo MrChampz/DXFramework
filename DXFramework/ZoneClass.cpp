@@ -174,7 +174,8 @@ bool ZoneClass::Initialize(D3DClass* Direct3D, HWND hwnd, int screenWidth, int s
 	}
 
 	// Initialize the Model object
-	result = m_Model->Initialize(Direct3D->GetDevice(), "Data/Cube.vin", "Data/Tile_diff.tga", "Data/Tile_norm.tga", "Data/Tile_spec.tga");
+	result = m_Model->Initialize(Direct3D->GetDevice(), "Data/IronQueen.vin",
+		"Data/IronQueen_diff.tga", "Data/IronQueen_norm.tga", "Data/IronQueen_spec.tga");
 	if (!result)
 	{
 		MessageBox(hwnd, L"Could not initialize the Model object", L"Error", MB_OK);
@@ -185,7 +186,7 @@ bool ZoneClass::Initialize(D3DClass* Direct3D, HWND hwnd, int screenWidth, int s
 	m_modelPosX = 40.0f;
 	m_modelPosZ = 40.0f;
 	m_Terrain->GetHeightAtPosition(m_modelPosX, m_modelPosZ, m_modelPosY);
-	m_modelPosY += 5.0f;
+	m_modelPosY += 3.0f;
 
 	// Set the UI to display by default
 	m_displayUI = true;

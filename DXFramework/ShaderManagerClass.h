@@ -11,6 +11,8 @@
 #include "TextureShaderClass.h"
 #include "BumpMapShaderClass.h"
 #include "SpecMapShaderClass.h"
+#include "FogShaderClass.h"
+#include "ClipPlaneShaderClass.h"
 #include "LightShaderClass.h"
 #include "ReflectionShaderClass.h"
 #include "FontShaderClass.h"
@@ -38,6 +40,8 @@ public:
 		XMFLOAT3, XMFLOAT4);
 	bool RenderSpecMapShader(ID3D10Device*, int, XMMATRIX, XMMATRIX, XMMATRIX, ID3D10ShaderResourceView**,
 		XMFLOAT3, XMFLOAT4, XMFLOAT3, XMFLOAT4, float);
+	bool RenderFogShader(ID3D10Device*, int, XMMATRIX, XMMATRIX, XMMATRIX, ID3D10ShaderResourceView*, float, float);
+	bool RenderClipPlaneShader(ID3D10Device*, int, XMMATRIX, XMMATRIX, XMMATRIX, ID3D10ShaderResourceView*, XMFLOAT4);
 	bool RenderLightShader(ID3D10Device*, int, XMMATRIX, XMMATRIX, XMMATRIX, ID3D10ShaderResourceView*,
 		XMFLOAT3, XMFLOAT3, XMFLOAT4);
 	bool RenderReflectionShader(ID3D10Device*, int, XMMATRIX, XMMATRIX, XMMATRIX, ID3D10ShaderResourceView*,
@@ -55,6 +59,8 @@ private:
 	TextureShaderClass* m_TextureShader;
 	BumpMapShaderClass* m_BumMapShader;
 	SpecMapShaderClass* m_SpecMapShader;
+	FogShaderClass* m_FogShader;
+	ClipPlaneShaderClass* m_ClipPlaneShader;
 	LightShaderClass* m_LightShader;
 	ReflectionShaderClass* m_ReflectionShader;
 	FontShaderClass* m_FontShader;

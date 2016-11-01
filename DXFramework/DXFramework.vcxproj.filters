@@ -159,6 +159,12 @@
     <ClCompile Include="SandBox\TGALoader.cpp">
       <Filter>SandBox</Filter>
     </ClCompile>
+    <ClCompile Include="FogShaderClass.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ClipPlaneShaderClass.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="SystemClass.h">
@@ -299,6 +305,12 @@
     <ClInclude Include="SandBox\TGALoader.h">
       <Filter>SandBox</Filter>
     </ClInclude>
+    <ClInclude Include="FogShaderClass.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ClipPlaneShaderClass.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Shaders\Color.ps">
@@ -384,6 +396,18 @@
       <Filter>Shaders</Filter>
     </None>
     <None Include="Shaders\SpecMap.vs">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="Shaders\Fog.ps">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="Shaders\Fog.vs">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="Shaders\ClipPlane.ps">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="Shaders\ClipPlane.vs">
       <Filter>Shaders</Filter>
     </None>
   </ItemGroup>

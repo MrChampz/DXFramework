@@ -9,6 +9,8 @@ ShaderManagerClass::ShaderManagerClass()
 	m_TextureShader = 0;
 	m_BumMapShader = 0;
 	m_SpecMapShader = 0;
+	m_FogShader = 0;
+	m_ClipPlaneShader = 0;
 	m_LightShader = 0;
 	m_ReflectionShader = 0;
 	m_FontShader = 0;
@@ -29,7 +31,6 @@ ShaderManagerClass::~ShaderManagerClass()
 bool ShaderManagerClass::Initialize(ID3D10Device* device, HWND hwnd)
 {
 	bool result;
-
 
 	// Create the ColorShader object.
 	m_ColorShader = new ColorShaderClass;
@@ -82,6 +83,34 @@ bool ShaderManagerClass::Initialize(ID3D10Device* device, HWND hwnd)
 
 	// Initialize the SpecMapShader object.
 	result = m_SpecMapShader->Initialize(device, hwnd);
+	if (!result)
+	{
+		return false;
+	}
+
+	// Create the FogShader object.
+	m_FogShader = new FogShaderClass;
+	if (!m_FogShader)
+	{
+		return false;
+	}
+
+	// Initialize the FogShader object.
+	result = m_FogShader->Initialize(device, hwnd);
+	if (!result)
+	{
+		return false;
+	}
+
+	// Create the ClipPlaneShader object.
+	m_ClipPlaneShader = new ClipPlaneShaderClass;
+	if (!m_ClipPlaneShader)
+	{
+		return false;
+	}
+
+	// Initialize the ClipPlaneShader object.
+	result = m_ClipPlaneShader->Initialize(device, hwnd);
 	if (!result)
 	{
 		return false;
@@ -238,6 +267,22 @@ void ShaderManagerClass::Shutdown()
 		m_ReflectionShader = 0;
 	}
 
+	// Release the ClipPlane object.
+	if (m_ClipPlaneShader)
+	{
+		m_ClipPlaneShader->Shutdown();
+		delete m_ClipPlaneShader;
+		m_ClipPlaneShader = 0;
+	}
+
+	// Release the FogShader object.
+	if (m_FogShader)
+	{
+		m_FogShader->Shutdown();
+		delete m_FogShader;
+		m_FogShader = 0;
+	}
+
 	// Release the SpecMapShader object.
 	if (m_SpecMapShader)
 	{
@@ -307,6 +352,18 @@ bool ShaderManagerClass::RenderSpecMapShader(ID3D10Device* device, int indexCoun
 {
 	return m_SpecMapShader->Render(device, indexCount, worldMatrix, viewMatrix, projectionMatrix, textureArray,
 		lightDirection, diffuseColor, cameraPosition, specularColor, specularPower);
+}
+
+bool ShaderManagerClass::RenderFogShader(ID3D10Device* device, int indexCount, XMMATRIX worldMatrix, XMMATRIX viewMatrix,
+	XMMATRIX projectionMatrix, ID3D10ShaderResourceView* texture, float fogStart, float fogEnd)
+{
+	return m_FogShader->Render(device, indexCount, worldMatrix, viewMatrix, projectionMatrix, texture, fogStart, fogEnd);
+}
+
+bool ShaderManagerClass::RenderClipPlaneShader(ID3D10Device* device, int indexCount, XMMATRIX worldMatrix,
+	XMMATRIX viewMatrix, XMMATRIX projectionMatrix, ID3D10ShaderResourceView* texture, XMFLOAT4 clipPlane)
+{
+	return m_ClipPlaneShader->Render(device, indexCount, worldMatrix, viewMatrix, projectionMatrix, texture, clipPlane);
 }
 
 bool ShaderManagerClass::RenderLightShader(ID3D10Device* device, int indexCount, XMMATRIX worldMatrix,
